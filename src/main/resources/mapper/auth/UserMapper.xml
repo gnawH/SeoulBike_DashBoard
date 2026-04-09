@@ -11,7 +11,7 @@
     </insert>
 
     <!-- 로그인 (특정 회원 조회) -->
-    <select id="selectMember" resultType="Member">
+    <select id="findByUserId" resultType="Member">
         SELECT userid AS userId, name, password, email, region, role
         FROM member
         WHERE userid = #{userid}
