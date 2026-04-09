@@ -11,6 +11,7 @@ public class SecuriryConfig {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+		
 	}
 
 }
