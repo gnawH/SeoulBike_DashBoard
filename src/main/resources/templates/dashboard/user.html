@@ -1,53 +1,42 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seoul Bike - Guest Page</title>
-    <!-- FontAwesome & Fonts -->
-    <script>window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous"
-        referrerpolicy="no-referrer"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <!-- Plotly -->
-    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
-    <!-- Tailwind CSS & Config -->
+    <title>SeoulBike Dashboard</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        bike: { green: '#32C358', light: '#EAF8EE', dark: '#1E293B', gray: '#F3F4F6', text: '#475569' }
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
                     },
-                    backgroundImage: {
-                        'mesh': 'radial-gradient(at 0% 0%, rgba(50, 195, 88, 0.05) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(50, 195, 88, 0.05) 0px, transparent 50%)',
+                    colors: {
+                        'bike-green': '#32C358',
+                        'bike-dark': '#29A349',
+                        'bike-light': '#EAF8EE',
                     }
                 }
             }
         }
     </script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #F8FAFC;
-        }
-
-        ::-webkit-scrollbar {
-            display: none;
-        }
-    </style>
+    <!-- Leaflet CSS & JS (오픈소스) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/style.css">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 </head>
 
 <body>
     <div th:fragment="content" class="flex flex-col w-full h-full">
-        <!-- Global Header (Top-aligned, Full-width) -->
+        <!-- Global Header -->
         <header
             class="w-full bg-white border-b border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] px-8 py-4 flex items-center justify-between z-50 sticky top-0">
             <!-- Logo / Brand -->
@@ -59,7 +48,7 @@
                 <span class="text-slate-900 font-bold text-xl tracking-tight">SeoulBike Analytics</span>
             </div>
 
-            <!-- Right Utilities (Language & Notifications) -->
+            <!-- Right Utilities -->
             <div class="flex items-center gap-4">
                 <!-- Language Selector -->
                 <div class="relative">
@@ -74,8 +63,7 @@
                         class="hidden absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.08)] border border-slate-100 overflow-hidden z-50">
                         <button type="button"
                             class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 text-bike-green font-medium flex items-center justify-between">
-                            한국어
-                            <i class="fa-solid fa-check text-[10px]"></i>
+                            한국어 <i class="fa-solid fa-check text-[10px]"></i>
                         </button>
                         <button type="button"
                             class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 text-slate-600 transition-colors">
@@ -86,7 +74,6 @@
                 <button
                     class="relative w-10 h-10 flex items-center justify-center bg-slate-50 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-slate-100 text-slate-500 hover:text-bike-green hover:border-bike-green transition-colors">
                     <i class="fa-regular fa-bell text-lg"></i>
-                    <!-- <span class="absolute top-2 right-2.5 w-2 h-2 bg-[#EF4444] rounded-full border border-white"></span> -->
                 </button>
 
                 <!-- Profile Dropdown -->
@@ -97,7 +84,6 @@
                         <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-4.jpg"
                             alt="User Profile" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
                     </button>
-                    <!-- Profile Menu Box -->
                     <div id="profileDropdownMenu"
                         class="hidden absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden z-50">
                         <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
@@ -122,10 +108,9 @@
 
         <!-- Main Content Area -->
         <main class="flex-1 w-full max-w-[1440px] mx-auto p-8 flex flex-col gap-8">
-
             <!-- KPI Summary Ribbon -->
             <section id="kpi_summary_ribbon" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Card 1: 탄소 절감량 -->
+                <!-- Card 1 -->
                 <div
                     class="bg-white p-5 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden group hover:border-bike-green transition-colors cursor-default">
                     <div class="flex justify-between items-start mb-4">
@@ -140,11 +125,9 @@
                     </div>
                     <h3 class="text-slate-500 text-sm font-medium mb-1">2025년 총 탄소 절감량</h3>
                     <div class="text-2xl font-bold text-slate-900 group-hover:text-bike-green transition-colors">2,450.5
-                        <span class="text-lg font-normal text-slate-500">ton</span>
-                    </div>
+                        <span class="text-lg font-normal text-slate-500">ton</span></div>
                 </div>
-
-                <!-- Card 2: 주행거리 -->
+                <!-- Card 2 -->
                 <div
                     class="bg-white p-5 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden group hover:border-blue-400 transition-colors cursor-default">
                     <div class="flex justify-between items-start mb-4">
@@ -157,8 +140,7 @@
                     <div class="text-2xl font-bold text-slate-900 group-hover:text-blue-500 transition-colors">
                         14,500,210 <span class="text-lg font-normal text-slate-500">km</span></div>
                 </div>
-
-                <!-- Card 3: 핫플레이스 -->
+                <!-- Card 3 -->
                 <div
                     class="bg-white p-5 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden group hover:border-orange-400 transition-colors cursor-default">
                     <div class="flex justify-between items-start mb-4">
@@ -174,8 +156,7 @@
                     <div class="text-2xl font-bold text-slate-900 group-hover:text-orange-500 transition-colors">여의나루역
                         1번출구</div>
                 </div>
-
-                <!-- Card 4: 이용 시간 -->
+                <!-- Card 4 -->
                 <div
                     class="bg-white p-5 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden group hover:border-purple-400 transition-colors cursor-default">
                     <div class="flex justify-between items-start mb-4">
@@ -189,8 +170,7 @@
                     </div>
                     <h3 class="text-slate-500 text-sm font-medium mb-1">2025년 누적 이용 시간</h3>
                     <div class="text-2xl font-bold text-slate-900 group-hover:text-purple-500 transition-colors">452,000
-                        <span class="text-lg font-normal text-slate-500">시간</span>
-                    </div>
+                        <span class="text-lg font-normal text-slate-500">시간</span></div>
                 </div>
             </section>
 
@@ -347,44 +327,12 @@
                 </div>
 
                 <div class="flex flex-col lg:flex-row gap-6">
-                    <div
-                        class="flex-1 h-[400px] rounded-xl overflow-hidden border border-slate-200 relative bg-slate-100">
-                        <img class="w-full h-full object-cover opacity-80 mix-blend-multiply"
-                            src="https://storage.googleapis.com/uxpilot-auth.appspot.com/e658ed3992-6a3b910a5736bd8c199c.png"
-                            alt="Map" />
-
-                        <div class="absolute inset-0">
-                            <div
-                                class="absolute top-[30%] left-[45%] w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-md animate-pulse">
-                            </div>
-                            <div
-                                class="absolute top-[45%] left-[35%] w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-md">
-                            </div>
-                            <div
-                                class="absolute top-[60%] left-[55%] w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-md">
-                            </div>
-                            <div
-                                class="absolute top-[25%] left-[60%] w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-md">
-                            </div>
-                            <div
-                                class="absolute top-[50%] left-[70%] w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-md">
-                            </div>
-
-                            <div
-                                class="absolute top-[40%] left-[20%] w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-md animate-pulse">
-                            </div>
-                            <div
-                                class="absolute top-[70%] left-[40%] w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-md">
-                            </div>
-                            <div
-                                class="absolute top-[15%] left-[30%] w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-md">
-                            </div>
-                            <div
-                                class="absolute top-[55%] left-[25%] w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-md">
-                            </div>
-                            <div
-                                class="absolute top-[80%] left-[65%] w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-md">
-                            </div>
+                    <div id="realtimeMap"
+                        class="flex-1 h-[400px] rounded-xl overflow-hidden border border-slate-200 relative bg-slate-100 flex items-center justify-center z-0">
+                        <div class="text-center z-0">
+                            <p class="text-sm text-slate-500 font-medium mb-1">
+                                <i class="fa-solid fa-map-location-dot mr-1"></i> 지도를 불러오는 중입니다...
+                            </p>
                         </div>
                     </div>
 
@@ -393,23 +341,9 @@
                             <h3 class="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                                 <i class="fa-solid fa-battery-full"></i> 회수 필요 대여소 Top 4
                             </h3>
-                            <div class="space-y-3">
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-slate-700 font-medium">1. 여의도역 1번출구 앞</span>
-                                    <span class="text-blue-600 font-bold">142%</span>
-                                </div>
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-slate-700 font-medium">2. 홍대입구역 2번출구</span>
-                                    <span class="text-blue-600 font-bold">115%</span>
-                                </div>
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-slate-700 font-medium">3. 강남역 11번출구 앞</span>
-                                    <span class="text-blue-600 font-bold">108%</span>
-                                </div>
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-slate-700 font-medium">4. 건대입구역 2번출구</span>
-                                    <span class="text-blue-600 font-bold">103%</span>
-                                </div>
+                            <div class="space-y-3" id="excessList">
+                                <div class="text-sm text-blue-600 font-medium flex items-center gap-2"><i
+                                        class="fa-solid fa-spinner fa-spin"></i> 로딩중...</div>
                             </div>
                         </div>
 
@@ -417,23 +351,9 @@
                             <h3 class="text-sm font-bold text-red-900 mb-3 flex items-center gap-2">
                                 <i class="fa-solid fa-battery-empty"></i> 보충 필요 대여소 Top 4
                             </h3>
-                            <div class="space-y-3">
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-slate-700 font-medium">1. 서울숲 공원 입구</span>
-                                    <span class="text-red-600 font-bold">0%</span>
-                                </div>
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-slate-700 font-medium">2. 올림픽공원 북문</span>
-                                    <span class="text-red-600 font-bold">2%</span>
-                                </div>
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-slate-700 font-medium">3. 마포대교 남단</span>
-                                    <span class="text-red-600 font-bold">5%</span>
-                                </div>
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-slate-700 font-medium">4. 뚝섬유원지역 1번출구</span>
-                                    <span class="text-red-600 font-bold">9%</span>
-                                </div>
+                            <div class="space-y-3" id="shortageList">
+                                <div class="text-sm text-red-600 font-medium flex items-center gap-2"><i
+                                        class="fa-solid fa-spinner fa-spin"></i> 로딩중...</div>
                             </div>
                         </div>
                     </div>
@@ -502,21 +422,17 @@
 
             // Chart Update Logic
             function updateUsageChart(period, btnElement) {
-                // 1. Update Buttons
                 const container = document.getElementById('chartPeriodSelector');
                 const buttons = container.querySelectorAll('button');
 
-                // Reset all to unselected
                 buttons.forEach(btn => {
                     btn.classList.remove('bg-white', 'text-slate-800', 'shadow-sm', 'border-slate-200');
                     btn.classList.add('text-slate-500', 'border-transparent');
                 });
 
-                // Set clicked button to selected
                 btnElement.classList.remove('text-slate-500', 'border-transparent');
                 btnElement.classList.add('bg-white', 'text-slate-800', 'shadow-sm', 'border-slate-200');
 
-                // 2. Update Data
                 let nx = [], ny = [];
                 if (period === 'daily') {
                     nx = ['10/18', '10/19', '10/20', '10/21', '10/22', '10/23', '10/24'];
@@ -532,35 +448,26 @@
                     ny = [12000000, 14500000, 15200000, 17500000];
                 }
 
-                // Push new data to Plotly
-                Plotly.update('usageTrendsChart', {
-                    x: [nx],
-                    y: [ny]
-                });
+                Plotly.update('usageTrendsChart', { x: [nx], y: [ny] });
             }
 
             function updateTopStationsChart(month) {
-                // Determine mock data based on month (or 'all')
                 let nx = [], ny = [];
                 if (month === 'all') {
                     nx = [2100000, 1850000, 1450000, 1200000, 950000];
                     ny = ['여의도공원    ', '뚝섬유원지    ', '홍대입구역    ', '강남역    ', '신촌역    '];
                 } else if (month === '4' || month === '5' || month === '9' || month === '10') {
-                    // Spring/Autumn hot spots
                     nx = [342000, 280000, 210000, 195000, 152000];
                     ny = ['여의나루역    ', '올림픽공원    ', '서울숲    ', '뚝섬유원지    ', '반포한강공원    '];
                 } else {
-                    // Default logic
                     const base = parseInt(month) * 15000;
                     nx = [base + 50000, base + 40000, base + 25000, base + 12000, base];
                     ny = ['여의도공원    ', '강남역    ', '잠실역    ', '고속터미널역    ', '신도림역    '];
                 }
-
-                // Push new data to Plotly
                 Plotly.update('topStationsChart', { x: [nx], y: [ny] });
             }
 
-            // Language Dropdown Logic
+            // Language Dropdown
             const langBtnToggle = document.getElementById('langToggleBtn');
             const langMenuBox = document.getElementById('langDropdownMenu');
 
@@ -570,43 +477,146 @@
                     option.addEventListener('click', function (e) {
                         e.preventDefault();
                         const selectedLang = this.textContent.trim().replace('KO / EN', '').trim();
-
-                        // Update button text span
                         const langSpan = langBtnToggle.querySelector('span');
-                        if (langSpan) {
-                            langSpan.textContent = selectedLang;
-                        }
+                        if (langSpan) { langSpan.textContent = selectedLang; }
 
-                        // Reset all options to default state
                         langOptions.forEach(opt => {
                             opt.className = 'w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 text-slate-600 transition-colors flex items-center justify-between';
-                            opt.innerHTML = opt.textContent.trim(); // Remove any HTML (like icons) and keep only text
+                            opt.innerHTML = opt.textContent.trim();
                         });
 
-                        // Set chosen option to active state
                         this.className = 'w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 text-bike-green font-medium flex items-center justify-between';
                         this.innerHTML = `${selectedLang} <i class="fa-solid fa-check text-[10px]"></i>`;
-
-                        // Close menu
                         langMenuBox.classList.add('hidden');
                     });
                 });
             }
 
-            // Close dropdowns when clicking outside
+            // Profile Dropdown
             const profileBtnToggle = document.getElementById('profileToggleBtn');
             const profileMenuBox = document.getElementById('profileDropdownMenu');
 
             document.addEventListener('click', function (e) {
-                // Close language
                 if (langBtnToggle && langMenuBox && !langBtnToggle.contains(e.target) && !langMenuBox.contains(e.target)) {
                     langMenuBox.classList.add('hidden');
                 }
-                // Close profile
                 if (profileBtnToggle && profileMenuBox && !profileBtnToggle.contains(e.target) && !profileMenuBox.contains(e.target)) {
                     profileMenuBox.classList.add('hidden');
                 }
             });
+
+            // Leaflet Map Initialization & Real-time Public Data Fetching
+            async function initLeafletMap() {
+                try {
+                    const mapContainer = document.getElementById('realtimeMap');
+                    if (!mapContainer || typeof L === 'undefined') return;
+
+                    mapContainer.innerHTML = '';
+
+                    const map = L.map('realtimeMap').setView([37.5408, 126.9855], 11);
+
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                        maxZoom: 19,
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CartoDB</a>'
+                    }).addTo(map);
+
+                    const response = await fetch('http://openapi.seoul.go.kr:8088/736467435a7072693933696864776f/json/bikeList/1/1000/');
+                    const data = await response.json();
+
+                    if (data.rentBikeStatus && data.rentBikeStatus.row) {
+                        const rows = data.rentBikeStatus.row;
+
+                        rows.forEach(r => {
+                            r.sharedInt = parseInt(r.shared, 10);
+                            r.rackTotCntInt = parseInt(r.rackTotCnt, 10); // 전체 거치대 개수
+                            r.parkingBikeTotCntInt = parseInt(r.parkingBikeTotCnt, 10); // 현재 주차된 자전거 개수
+                        });
+
+                        // 회수 필요 (거치율 높은 순 -> 거치대 개수 많은 순)
+                        const sortedDesc = [...rows].sort((a, b) => {
+                            if (b.sharedInt === a.sharedInt) return b.rackTotCntInt - a.rackTotCntInt;
+                            return b.sharedInt - a.sharedInt;
+                        });
+                        const top4Excess = sortedDesc.slice(0, 4);
+
+                        // 보충 필요 (거치율 낮은 순 -> 거치대 개수 많은 순)
+                        const sortedAsc = [...rows].sort((a, b) => {
+                            if (a.sharedInt === b.sharedInt) return b.rackTotCntInt - a.rackTotCntInt;
+                            return a.sharedInt - b.sharedInt;
+                        });
+                        const top4Shortage = sortedAsc.slice(0, 4);
+
+                        const excessListHtml = document.getElementById('excessList');
+                        const shortageListHtml = document.getElementById('shortageList');
+                        if (excessListHtml) excessListHtml.innerHTML = '';
+                        if (shortageListHtml) shortageListHtml.innerHTML = '';
+
+                        const renderStation = (station, type, index) => {
+                            const isExcess = type === 'excess';
+                            const markerColor = isExcess ? '#3B82F6' : '#EF4444';
+                            const pulseClass = index < 1 ? 'animate-pulse' : '';
+
+                            const cleanName = station.stationName.replace(/^[0-9]+\.\s*/, '');
+
+                            const customIcon = L.divIcon({
+                                className: 'custom-div-icon',
+                                html: `
+                                    <div style="position:relative; display:flex; align-items:center;">
+                                        <div class="${pulseClass}" style="width:28px;height:28px;background:${markerColor};border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:12px;z-index:2;position:relative;">
+                                            ${index + 1}
+                                        </div>
+                                        <div style="position:absolute;left:20px;background:white;padding:3px 8px 3px 14px;border-radius:0 12px 12px 0;font-size:11px;font-weight:bold;color:#333;box-shadow:0 1px 3px rgba(0,0,0,0.2);white-space:nowrap;z-index:1;border:1px solid #e2e8f0;border-left:none;">
+                                            ${cleanName}
+                                        </div>
+                                    </div>
+                                `,
+                                iconSize: [120, 28],
+                                iconAnchor: [14, 14],
+                                popupAnchor: [0, -14]
+                            });
+
+                            L.marker([station.stationLatitude, station.stationLongitude], { icon: customIcon })
+                                .addTo(map)
+                                .bindPopup(`<div style="text-align:center;"><b>${cleanName}</b><br><span style="color:${markerColor}; font-weight:bold;">현재 거치율: ${station.shared}%</span></div>`);
+
+                            return `
+                                <div class="flex justify-between items-center text-sm py-0.5">
+                                    <span class="text-slate-700 font-medium truncate w-[60%]" title="${cleanName}">${index + 1}. ${cleanName}</span>
+                                    <div class="flex items-center gap-1.5 justify-end w-[40%]">
+                                        <span class="text-[10px] text-slate-400 font-medium whitespace-nowrap">(${station.parkingBikeTotCntInt}/${station.rackTotCntInt}대)</span>
+                                        <span class="${isExcess ? 'text-blue-600' : 'text-red-600'} font-bold whitespace-nowrap">${station.shared}%</span>
+                                    </div>
+                                </div>
+                            `;
+                        };
+
+                        if (excessListHtml) {
+                            top4Excess.forEach((station, idx) => {
+                                excessListHtml.innerHTML += renderStation(station, 'excess', idx);
+                            });
+                        }
+
+                        if (shortageListHtml) {
+                            top4Shortage.forEach((station, idx) => {
+                                shortageListHtml.innerHTML += renderStation(station, 'shortage', idx);
+                            });
+                        }
+
+                        if (top4Excess.length > 0) {
+                            map.flyTo([top4Excess[0].stationLatitude, top4Excess[0].stationLongitude], 13, { duration: 1.5 });
+                        }
+                    }
+
+                } catch (e) {
+                    console.error("Map fetch error:", e);
+                    const excessListHtml = document.getElementById('excessList');
+                    const shortageListHtml = document.getElementById('shortageList');
+                    if (excessListHtml) excessListHtml.innerHTML = '<span class="text-sm text-slate-500">데이터를 불러오지 못했습니다.</span>';
+                    if (shortageListHtml) shortageListHtml.innerHTML = '<span class="text-sm text-slate-500">데이터를 불러오지 못했습니다.</span>';
+                }
+            }
+
+            window.addEventListener('load', () => setTimeout(initLeafletMap, 500));
         </script>
     </div>
 </body>
