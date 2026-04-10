@@ -1,0 +1,332 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "../mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.seoulbike.dashboard.dao.IDashboardRepository">
+
+    <!--
+      대시보드 Mapper 가이드
+      1) 아래 SQL은 화면 요구사항에 맞춘 기본 골격입니다.
+      2) 실제 테이블/컬럼명은 팀 DB 스키마에 맞게 교체하세요.
+      3) 기간 집계(daily/monthly/quarterly/half-yearly)는 periodType 기준으로 서비스에서 분기하거나,
+         SQL 동적문으로 확장 가능합니다.
+    -->
+
+    <resultMap id="dashboardKpiResultMap" type="com.example.seoulbike.dashboard.model.DashboardKpi">
+        <result property="carbonReductionTon" column="CARBON_REDUCTION_TON" />
+        <result property="treeEquivalentCount" column="TREE_EQUIVALENT_COUNT" />
+        <result property="totalDistanceKm" column="TOTAL_DISTANCE_KM" />
+        <result property="earthRoundsEquivalent" column="EARTH_ROUNDS_EQUIVALENT" />
+        <result property="topStationName" column="TOP_STATION_NAME" />
+        <result property="topStationRentCount" column="TOP_STATION_RENT_COUNT" />
+        <result property="totalUsageHours" column="TOTAL_USAGE_HOURS" />
+        <result property="yearOverYearGrowthRate" column="YOY_GROWTH_RATE" />
+    </resultMap>
+
+    <resultMap id="usageTrendResultMap" type="com.example.seoulbike.dashboard.model.DashboardTrendPoint">
+        <result property="periodLabel" column="PERIOD_LABEL" />
+        <result property="rentCount" column="RENT_COUNT" />
+    </resultMap>
+
+    <resultMap id="stationUsageResultMap" type="com.example.seoulbike.dashboard.model.DashboardStationUsage">
+        <result property="stationName" column="STATION_NAME" />
+        <result property="userCount" column="USER_COUNT" />
+        <result property="rank" column="RANK_NO" />
+    </resultMap>
+
+    <resultMap id="genderRatioResultMap" type="com.example.seoulbike.dashboard.model.DashboardGenderRatio">
+        <result property="malePercent" column="MALE_PERCENT" />
+        <result property="femalePercent" column="FEMALE_PERCENT" />
+    </resultMap>
+
+    <resultMap id="regionUsageResultMap" type="com.example.seoulbike.dashboard.model.DashboardRegionUsage">
+        <result property="regionName" column="REGION_NAME" />
+        <result property="usageCount" column="USAGE_COUNT" />
+        <result property="usagePercent" column="USAGE_PERCENT" />
+        <result property="rank" column="RANK_NO" />
+    </resultMap>
+
+    <resultMap id="seasonUsageResultMap" type="com.example.seoulbike.dashboard.model.DashboardSeasonUsage">
+        <result property="seasonName" column="SEASON_NAME" />
+        <result property="usageCount" column="USAGE_COUNT" />
+        <result property="usagePercent" column="USAGE_PERCENT" />
+    </resultMap>
+
+    <resultMap id="stationOccupancyResultMap" type="com.example.seoulbike.dashboard.model.DashboardStationOccupancy">
+        <result property="stationId" column="STATION_ID" />
+        <result property="stationName" column="STATION_NAME" />
+        <result property="regionName" column="REGION_NAME" />
+        <result property="latitude" column="LATITUDE" />
+        <result property="longitude" column="LONGITUDE" />
+        <result property="occupancyRate" column="OCCUPANCY_RATE" />
+        <result property="occupancyStatus" column="OCCUPANCY_STATUS" />
+    </resultMap>
+
+    <!-- 상단 KPI 조회 -->
+    <select id="selectDashboardKpi"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultMap="dashboardKpiResultMap">
+        SELECT
+            2450.5 AS CARBON_REDUCTION_TON,
+            150000 AS TREE_EQUIVALENT_COUNT,
+            14500210 AS TOTAL_DISTANCE_KM,
+            362 AS EARTH_ROUNDS_EQUIVALENT,
+            '여의나루역 1번출구' AS TOP_STATION_NAME,
+            1000 AS TOP_STATION_RENT_COUNT,
+            452000 AS TOTAL_USAGE_HOURS,
+            15 AS YOY_GROWTH_RATE
+        FROM DUAL
+    </select>
+
+    <!-- 기간별 대여 횟수 조회 -->
+    <select id="selectUsageTrend"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultMap="usageTrendResultMap">
+        SELECT PERIOD_LABEL, RENT_COUNT
+        FROM DASHBOARD_USAGE_TREND
+        WHERE YEAR_VAL = #{year}
+        ORDER BY PERIOD_ORDER
+    </select>
+
+    <!-- 대여소별 이용자 수 Top N -->
+    <select id="selectTopStationsByUsers"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultMap="stationUsageResultMap">
+        SELECT *
+        FROM (
+            SELECT
+                STATION_NAME,
+                USER_COUNT,
+                ROW_NUMBER() OVER (ORDER BY USER_COUNT DESC) AS RANK_NO
+            FROM DASHBOARD_STATION_USAGE
+            WHERE YEAR_VAL = #{year}
+              AND (#{month} IS NULL OR MONTH_VAL = #{month})
+        )
+        WHERE RANK_NO <![CDATA[ <= ]]> NVL(#{limit}, 5)
+        ORDER BY RANK_NO
+    </select>
+
+    <!-- 성별 비율 -->
+    <select id="selectGenderRatio"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultMap="genderRatioResultMap">
+        SELECT
+            MALE_PERCENT,
+            FEMALE_PERCENT
+        FROM DASHBOARD_GENDER_RATIO
+        WHERE YEAR_VAL = #{year}
+    </select>
+
+    <!-- 지역별 이용 분포 -->
+    <select id="selectRegionUsageDistribution"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultMap="regionUsageResultMap">
+        SELECT *
+        FROM (
+            SELECT
+                REGION_NAME,
+                USAGE_COUNT,
+                USAGE_PERCENT,
+                ROW_NUMBER() OVER (ORDER BY USAGE_COUNT DESC) AS RANK_NO
+            FROM DASHBOARD_REGION_USAGE
+            WHERE YEAR_VAL = #{year}
+        )
+        ORDER BY RANK_NO
+    </select>
+
+    <!-- 계절별 이용 분포 -->
+    <select id="selectSeasonUsageDistribution"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultMap="seasonUsageResultMap">
+        SELECT
+            SEASON_NAME,
+            USAGE_COUNT,
+            USAGE_PERCENT
+        FROM DASHBOARD_SEASON_USAGE
+        WHERE YEAR_VAL = #{year}
+        ORDER BY SEASON_ORDER
+    </select>
+
+    <!-- 실시간 거치율 지도 데이터 -->
+    <select id="selectRealtimeStationOccupancy"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultMap="stationOccupancyResultMap">
+        SELECT
+            O.STATION_ID,
+            O.STATION_NAME,
+            M.REGION_NAME,
+            O.LATITUDE,
+            O.LONGITUDE,
+            O.OCCUPANCY_RATE,
+            CASE
+                WHEN O.OCCUPANCY_RATE > NVL(#{occupancyThreshold}, 100) THEN 'OVER'
+                ELSE 'UNDER'
+            END AS OCCUPANCY_STATUS
+        FROM DASHBOARD_STATION_OCCUPANCY O
+        JOIN STATION_REGION_MAP M
+          ON O.STATION_ID = M.STATION_ID
+        WHERE O.LAST_UPDATED_AT = (
+            SELECT MAX(LAST_UPDATED_AT) FROM DASHBOARD_STATION_OCCUPANCY
+        )
+                    AND (#{regionName} IS NULL OR M.REGION_NAME = #{regionName})
+    </select>
+
+    <!-- 로그인 사용자의 구 기준 거치율 상위 N개 -->
+    <select id="selectTop5StationsByRegion"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultMap="stationOccupancyResultMap">
+        SELECT *
+        FROM (
+            SELECT
+                O.STATION_ID,
+                O.STATION_NAME,
+                M.REGION_NAME,
+                O.LATITUDE,
+                O.LONGITUDE,
+                O.OCCUPANCY_RATE,
+                CASE
+                    WHEN O.OCCUPANCY_RATE > NVL(#{occupancyThreshold}, 100) THEN 'OVER'
+                    ELSE 'UNDER'
+                END AS OCCUPANCY_STATUS
+            FROM DASHBOARD_STATION_OCCUPANCY O
+            JOIN STATION_REGION_MAP M
+              ON O.STATION_ID = M.STATION_ID
+            WHERE O.LAST_UPDATED_AT = (
+                SELECT MAX(LAST_UPDATED_AT) FROM DASHBOARD_STATION_OCCUPANCY
+            )
+              AND M.REGION_NAME = #{regionName}
+            ORDER BY O.OCCUPANCY_RATE DESC
+        )
+        WHERE ROWNUM <![CDATA[ <= ]]> NVL(#{limit}, 5)
+    </select>
+
+    <!-- 로그인 사용자의 구 기준 거치율 하위 N개 -->
+    <select id="selectBottom5StationsByRegion"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultMap="stationOccupancyResultMap">
+        SELECT *
+        FROM (
+            SELECT
+                O.STATION_ID,
+                O.STATION_NAME,
+                M.REGION_NAME,
+                O.LATITUDE,
+                O.LONGITUDE,
+                O.OCCUPANCY_RATE,
+                CASE
+                    WHEN O.OCCUPANCY_RATE > NVL(#{occupancyThreshold}, 100) THEN 'OVER'
+                    ELSE 'UNDER'
+                END AS OCCUPANCY_STATUS
+            FROM DASHBOARD_STATION_OCCUPANCY O
+            JOIN STATION_REGION_MAP M
+              ON O.STATION_ID = M.STATION_ID
+            WHERE O.LAST_UPDATED_AT = (
+                SELECT MAX(LAST_UPDATED_AT) FROM DASHBOARD_STATION_OCCUPANCY
+            )
+              AND M.REGION_NAME = #{regionName}
+            ORDER BY O.OCCUPANCY_RATE ASC
+        )
+        WHERE ROWNUM <![CDATA[ <= ]]> NVL(#{limit}, 5)
+    </select>
+
+    <!-- CSV 다운로드: 기준값 초과(내림차순) -->
+    <select id="selectOverThresholdStationsForCsv"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultMap="stationOccupancyResultMap">
+        SELECT
+            O.STATION_ID,
+            O.STATION_NAME,
+            M.REGION_NAME,
+            O.LATITUDE,
+            O.LONGITUDE,
+            O.OCCUPANCY_RATE,
+            'OVER' AS OCCUPANCY_STATUS
+        FROM DASHBOARD_STATION_OCCUPANCY O
+        JOIN STATION_REGION_MAP M
+          ON O.STATION_ID = M.STATION_ID
+        WHERE O.LAST_UPDATED_AT = (
+            SELECT MAX(LAST_UPDATED_AT) FROM DASHBOARD_STATION_OCCUPANCY
+        )
+          AND M.REGION_NAME = #{regionName}
+          AND O.OCCUPANCY_RATE > NVL(#{occupancyThreshold}, 100)
+        ORDER BY O.OCCUPANCY_RATE DESC
+    </select>
+
+    <!-- CSV 다운로드: 기준값 이하(오름차순) -->
+    <select id="selectUnderOrEqualThresholdStationsForCsv"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultMap="stationOccupancyResultMap">
+        SELECT
+            O.STATION_ID,
+            O.STATION_NAME,
+            M.REGION_NAME,
+            O.LATITUDE,
+            O.LONGITUDE,
+            O.OCCUPANCY_RATE,
+            'UNDER' AS OCCUPANCY_STATUS
+        FROM DASHBOARD_STATION_OCCUPANCY O
+        JOIN STATION_REGION_MAP M
+          ON O.STATION_ID = M.STATION_ID
+        WHERE O.LAST_UPDATED_AT = (
+            SELECT MAX(LAST_UPDATED_AT) FROM DASHBOARD_STATION_OCCUPANCY
+        )
+          AND M.REGION_NAME = #{regionName}
+          AND O.OCCUPANCY_RATE <![CDATA[ <= ]]> NVL(#{occupancyThreshold}, 100)
+        ORDER BY O.OCCUPANCY_RATE ASC
+    </select>
+
+    <!-- 회수 필요 Top N -->
+    <select id="selectOverOccupiedStations"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultMap="stationOccupancyResultMap">
+        SELECT *
+        FROM (
+            SELECT
+                O.STATION_ID,
+                O.STATION_NAME,
+                M.REGION_NAME,
+                O.LATITUDE,
+                O.LONGITUDE,
+                O.OCCUPANCY_RATE,
+                'OVER' AS OCCUPANCY_STATUS
+            FROM DASHBOARD_STATION_OCCUPANCY O
+            JOIN STATION_REGION_MAP M
+              ON O.STATION_ID = M.STATION_ID
+            WHERE O.LAST_UPDATED_AT = (
+                SELECT MAX(LAST_UPDATED_AT) FROM DASHBOARD_STATION_OCCUPANCY
+            )
+              AND O.OCCUPANCY_RATE > NVL(#{occupancyThreshold}, 100)
+              AND (#{regionName} IS NULL OR M.REGION_NAME = #{regionName})
+            ORDER BY O.OCCUPANCY_RATE DESC
+        )
+        WHERE ROWNUM <![CDATA[ <= ]]> NVL(#{limit}, 4)
+    </select>
+
+    <!-- 보충 필요 Top N -->
+    <select id="selectUnderOccupiedStations"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultMap="stationOccupancyResultMap">
+        SELECT *
+        FROM (
+            SELECT
+                O.STATION_ID,
+                O.STATION_NAME,
+                M.REGION_NAME,
+                O.LATITUDE,
+                O.LONGITUDE,
+                O.OCCUPANCY_RATE,
+                'UNDER' AS OCCUPANCY_STATUS
+            FROM DASHBOARD_STATION_OCCUPANCY O
+            JOIN STATION_REGION_MAP M
+              ON O.STATION_ID = M.STATION_ID
+            WHERE O.LAST_UPDATED_AT = (
+                SELECT MAX(LAST_UPDATED_AT) FROM DASHBOARD_STATION_OCCUPANCY
+            )
+              AND O.OCCUPANCY_RATE <![CDATA[ <= ]]> NVL(#{occupancyThreshold}, 100)
+              AND (#{regionName} IS NULL OR M.REGION_NAME = #{regionName})
+            ORDER BY O.OCCUPANCY_RATE ASC
+        )
+        WHERE ROWNUM <![CDATA[ <= ]]> NVL(#{limit}, 4)
+    </select>
+
+</mapper>
