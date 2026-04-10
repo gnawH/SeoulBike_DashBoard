@@ -9,13 +9,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import com.example.seoulbike.auth.model.AuthResponse;
 import com.example.seoulbike.auth.model.Login;
 import com.example.seoulbike.auth.model.Signup;
+import com.example.seoulbike.auth.service.AuthService;
 import com.example.seoulbike.auth.service.IAuthService;
+
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import com.example.seoulbike.auth.service.IAuthService;
 
 @Controller
 public class AuthController {
@@ -23,7 +24,7 @@ public class AuthController {
 
 	// 민호님 서비스 확인 후 연결
 	@Autowired
-	IAuthService  AuthService;
+	IAuthService AuthService;
 
 	
 	//로그인 페이지
@@ -37,7 +38,7 @@ public class AuthController {
 	public String login(Login loginDto,HttpSession session,HttpServletResponse response,Model model) {
 		try {
 			// JWT Service 연결
-			AuthResponse result = authService.login(loginDto);
+			AuthResponse result = AuthService.login(loginDto);
 			
 			//JWT 쿠키 저장
 			Cookie cookie = new Cookie("JWT", result.getToken());
@@ -68,7 +69,7 @@ public class AuthController {
 		
 		try {
 			//Todo: Service 연결 후 구현하기
-			authService.signup(signupDto);
+			AuthService.signup(signupDto);
 			return "redirect:/login";
 		}catch(RuntimeException e) {
 			model.addAttribute("message", e.getMessage());
