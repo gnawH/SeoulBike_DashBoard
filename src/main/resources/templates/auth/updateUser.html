@@ -171,8 +171,63 @@
                         class="w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-[0_4px_12px_rgba(50,195,88,0.3)] text-sm font-bold text-white bg-bike-green hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-100 transition-all transform hover:-translate-y-0.5">
                         수정 완료
                     </button>
+                    <button type="button" onclick="openDeleteModal()"
+                        class="w-full mt-3 flex justify-center items-center gap-2 py-3.5 px-4 border border-slate-200 rounded-xl text-sm font-bold text-slate-500 bg-white hover:bg-slate-50 hover:text-red-500 focus:outline-none transition-all">
+                        회원 탈퇴
+                    </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div id="deleteModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity opacity-0"
+            id="deleteModalBackdrop"></div>
+        <div class="fixed inset-0 z-10 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md transform scale-95 opacity-0 transition-opacity transition-transform duration-300 relative overflow-hidden"
+                id="deleteModalPanel">
+                <!-- Header -->
+                <div class="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800">회원 탈퇴</h3>
+                </div>
+
+                <form action="/" method="post">
+                    <!-- Body -->
+                    <div class="p-6">
+                        <p class="text-sm text-slate-600 mb-4 font-medium">안전한 탈퇴 처리를 위해 현재 비밀번호를 다시 한번 입력해 주세요. 탈퇴 시 모든
+                            데이터가 삭제되며 복구할 수 없습니다.</p>
+
+                        <div>
+                            <label for="delete_password" class="block text-sm font-bold text-slate-700 mb-1.5"><span
+                                    class="text-red-500 mr-1">*</span>비밀번호 확인</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-lock text-slate-300"></i>
+                                </div>
+                                <input type="password" id="delete_password" name="password" placeholder="현재 비밀번호 입력"
+                                    class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all font-medium"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="bg-slate-50 px-6 py-4 flex justify-end gap-3 rounded-b-2xl">
+                        <button type="button" onclick="closeDeleteModal()"
+                            class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-200 bg-slate-100 rounded-lg transition-colors focus:outline-none">
+                            취소
+                        </button>
+                        <button type="submit"
+                            class="px-5 py-2.5 text-sm font-bold text-white bg-red-500 hover:bg-red-600 rounded-lg shadow-[0_4px_12px_rgba(239,68,68,0.3)] transition-colors focus:outline-none focus:ring-4 focus:ring-red-100">
+                            탈퇴하기
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -255,6 +310,35 @@
             if (passwordConfirmInput) {
                 passwordConfirmInput.addEventListener('blur', checkPasswordMatch);
             }
+
+            // Modal Logic
+            window.openDeleteModal = function () {
+                const modal = document.getElementById('deleteModal');
+                const backdrop = document.getElementById('deleteModalBackdrop');
+                const panel = document.getElementById('deleteModalPanel');
+
+                modal.classList.remove('hidden');
+                // Allow browser to render display:block before transitioning opacity
+                setTimeout(() => {
+                    backdrop.classList.remove('opacity-0');
+                    panel.classList.remove('opacity-0', 'scale-95');
+                    panel.classList.add('opacity-100', 'scale-100');
+                }, 10);
+            };
+
+            window.closeDeleteModal = function () {
+                const modal = document.getElementById('deleteModal');
+                const backdrop = document.getElementById('deleteModalBackdrop');
+                const panel = document.getElementById('deleteModalPanel');
+
+                backdrop.classList.add('opacity-0');
+                panel.classList.remove('opacity-100', 'scale-100');
+                panel.classList.add('opacity-0', 'scale-95');
+
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300); // Matches Tailwind transition duration (300ms)
+            };
         });
     </script>
 </body>
