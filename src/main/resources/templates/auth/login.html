@@ -1,8 +1,133 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
 <head>
-<body>
-	
-</body>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seoul Bike - Login</title>
+
+    <!-- FontAwesome & Fonts -->
+    <script>window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        bike: { green: '#32C358', light: '#EAF8EE', dark: '#1E293B', gray: '#F3F4F6', text: '#475569' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #F8FAFC;
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
 </head>
+
+<body class="min-h-screen flex text-slate-800 font-sans antialiased selection:bg-bike-green selection:text-white">
+
+    <!-- Left Side: Image/Branding Background -->
+    <div class="hidden lg:flex lg:w-1/2 relative bg-slate-900 justify-center items-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1571068316344-75bc76f77890?q=80&w=2070&auto=format&fit=crop"
+                alt="Seoul Bike" class="w-full h-full object-cover opacity-40">
+            <div class="absolute inset-0 bg-gradient-to-t from-bike-dark via-bike-dark/80 to-transparent"></div>
+        </div>
+
+        <div class="relative z-10 p-12 text-center text-white max-w-lg">
+            <div
+                class="w-16 h-16 bg-bike-green rounded-2xl flex items-center justify-center text-white shadow-[0_8px_30px_rgba(50,195,88,0.4)] mx-auto mb-8">
+                <i class="fa-solid fa-bicycle text-3xl"></i>
+            </div>
+            <h1 class="text-4xl font-bold mb-4 tracking-tight">SeoulBike Analytics</h1>
+            <p class="text-lg text-slate-300 leading-relaxed font-medium">따릉이 데이터를 한눈에 파악하고,<br>스마트한 통계 자료를 활용해보세요.</p>
+        </div>
+    </div>
+
+    <!-- Right Side: Login Form -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 bg-white relative">
+        <!-- Back Button -->
+        <a href="/src/main/resources/templates/dashboard/guest.html"
+            class="absolute top-8 left-8 text-slate-400 hover:text-bike-green transition-colors flex items-center gap-2 text-sm font-medium">
+            <i class="fa-solid fa-arrow-left"></i> 대시보드로 돌아가기
+        </a>
+
+        <div class="w-full max-w-sm">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-900 mb-2 tracking-tight">환영합니다</h2>
+                <p class="text-sm text-slate-500 font-medium">서비스 이용을 위해 로그인을 진행해주세요.</p>
+            </div>
+
+            <form action="/" method="get" class="space-y-5">
+                <div>
+                    <label for="username" class="block text-sm font-bold text-slate-700 mb-1.5">아이디</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fa-regular fa-user text-slate-400"></i>
+                        </div>
+                        <input type="text" id="username" name="username" placeholder="아이디를 입력하세요"
+                            class="block w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all placeholder:text-slate-400 font-medium"
+                            required>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label for="password" class="block text-sm font-bold text-slate-700">비밀번호</label>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-lock text-slate-400"></i>
+                        </div>
+                        <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요"
+                            class="block w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all placeholder:text-slate-400 font-medium"
+                            required>
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit"
+                        class="w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-[0_4px_12px_rgba(50,195,88,0.3)] text-sm font-bold text-white bg-bike-green hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-100 transition-all transform hover:-translate-y-0.5">
+                        로그인
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-8 relative">
+                <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div class="w-full border-t border-slate-200"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-3 bg-white text-slate-400 font-medium">또는</span>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <p class="text-sm text-slate-600 font-medium">
+                    아직 계정이 없으신가요?
+                    <a href="/src/main/resources/templates/auth/signup.html"
+                        class="font-bold text-bike-green hover:underline ml-1">회원가입</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+</body>
+
 </html>

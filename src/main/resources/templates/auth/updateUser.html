@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seoul Bike - Sign Up</title>
+    <title>Seoul Bike - Update Profile</title>
 
     <!-- FontAwesome & Fonts -->
     <script>window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };</script>
@@ -42,7 +42,7 @@
 
 <body class="min-h-screen flex text-slate-800 font-sans antialiased selection:bg-bike-green selection:text-white">
 
-    <!-- Left Side: Login Form -->
+    <!-- Left Side: Form -->
     <div class="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 bg-white relative overflow-y-auto">
         <!-- Back Button -->
         <button type="button" onclick="history.back()"
@@ -55,34 +55,14 @@
                 <div class="flex items-center gap-3 mb-4">
                     <div
                         class="w-10 h-10 bg-bike-green rounded-xl flex items-center justify-center text-white shadow-[0_4px_12px_rgba(50,195,88,0.3)]">
-                        <i class="fa-solid fa-bicycle text-lg"></i>
+                        <i class="fa-solid fa-user-pen text-lg"></i>
                     </div>
                 </div>
-                <h2 class="text-3xl font-bold text-slate-900 mb-2 tracking-tight">회원가입 🚲</h2>
-                <p class="text-sm text-slate-500 font-medium">효율적인 따릉이 대여소 관리와 데이터 분석의 시작</p>
+                <h2 class="text-3xl font-bold text-slate-900 mb-2 tracking-tight">회원정보 수정</h2>
+                <p class="text-sm text-slate-500 font-medium">계정 정보를 확인하고 수정할 수 있습니다.</p>
             </div>
 
-            <!-- 
-              Note: action="/auth/signup" method="post" is standard Spring Boot. 
-              Since you are testing UI locally, the action will try to POST to standard browser handlers.
-            -->
-            <form action="/auth/signup" method="post" class="space-y-4">
-
-                <div>
-                    <label for="userid" class="block text-sm font-bold text-slate-700 mb-1.5"><span
-                            class="text-red-500 mr-1">*</span>아이디</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <i class="fa-regular fa-id-badge text-slate-300"></i>
-                        </div>
-                        <input type="text" id="userid" name="userid" placeholder="아이디를 입력해주세요." minlength="6"
-                            title="아이디는 6자 이상이어야 합니다."
-                            class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium"
-                            required>
-                    </div>
-                    <p id="userid-hint" class="text-xs text-slate-500 mt-1.5 ml-1"><i
-                            class="fa-solid fa-circle-info mr-1"></i>아이디는 6자 이상 입력해주세요.</p>
-                </div>
+            <form action="/auth/update" method="post" class="space-y-4">
 
                 <div>
                     <label for="name" class="block text-sm font-bold text-slate-700 mb-1.5"><span
@@ -99,7 +79,7 @@
 
                 <div>
                     <label for="password" class="block text-sm font-bold text-slate-700 mb-1.5"><span
-                            class="text-red-500 mr-1">*</span>비밀번호</label>
+                            class="text-red-500 mr-1">*</span>새로운 비밀번호</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fa-solid fa-lock text-slate-300"></i>
@@ -189,17 +169,64 @@
                 <div class="pt-6">
                     <button type="submit"
                         class="w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-[0_4px_12px_rgba(50,195,88,0.3)] text-sm font-bold text-white bg-bike-green hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-100 transition-all transform hover:-translate-y-0.5">
-                        가입 완료하기
+                        수정 완료
+                    </button>
+                    <button type="button" onclick="openDeleteModal()"
+                        class="w-full mt-3 flex justify-center items-center gap-2 py-3.5 px-4 border border-slate-200 rounded-xl text-sm font-bold text-slate-500 bg-white hover:bg-slate-50 hover:text-red-500 focus:outline-none transition-all">
+                        회원 탈퇴
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
 
-            <div class="mt-8 text-center pt-6 border-t border-slate-100">
-                <p class="text-sm text-slate-600 font-medium">
-                    이미 계정이 있으신가요?
-                    <a href="/src/main/resources/templates/auth/login.html"
-                        class="font-bold text-bike-green hover:underline ml-1">로그인하러 가기</a>
-                </p>
+    <!-- Delete Account Modal -->
+    <div id="deleteModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity opacity-0"
+            id="deleteModalBackdrop"></div>
+        <div class="fixed inset-0 z-10 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md transform scale-95 opacity-0 transition-opacity transition-transform duration-300 relative overflow-hidden"
+                id="deleteModalPanel">
+                <!-- Header -->
+                <div class="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800">회원 탈퇴</h3>
+                </div>
+
+                <form action="/" method="post">
+                    <!-- Body -->
+                    <div class="p-6">
+                        <p class="text-sm text-slate-600 mb-4 font-medium">안전한 탈퇴 처리를 위해 현재 비밀번호를 다시 한번 입력해 주세요. 탈퇴 시 모든
+                            데이터가 삭제되며 복구할 수 없습니다.</p>
+
+                        <div>
+                            <label for="delete_password" class="block text-sm font-bold text-slate-700 mb-1.5"><span
+                                    class="text-red-500 mr-1">*</span>비밀번호 확인</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-lock text-slate-300"></i>
+                                </div>
+                                <input type="password" id="delete_password" name="password" placeholder="현재 비밀번호 입력"
+                                    class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all font-medium"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="bg-slate-50 px-6 py-4 flex justify-end gap-3 rounded-b-2xl">
+                        <button type="button" onclick="closeDeleteModal()"
+                            class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-200 bg-slate-100 rounded-lg transition-colors focus:outline-none">
+                            취소
+                        </button>
+                        <button type="submit"
+                            class="px-5 py-2.5 text-sm font-bold text-white bg-red-500 hover:bg-red-600 rounded-lg shadow-[0_4px_12px_rgba(239,68,68,0.3)] transition-colors focus:outline-none focus:ring-4 focus:ring-red-100">
+                            탈퇴하기
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -207,44 +234,24 @@
     <!-- Right Side: Image/Branding Background -->
     <div class="hidden lg:flex lg:w-1/2 relative bg-slate-900 justify-center items-center overflow-hidden">
         <div class="absolute inset-0 z-0">
-            <!-- Han River / Seoul Bike image -->
-            <img src="https://images.unsplash.com/photo-1548115184-bc6544d06a58?q=80&w=2070&auto=format&fit=crop"
-                alt="Seoul View" class="w-full h-full object-cover opacity-60">
+            <!-- Professional Work Environment Image -->
+            <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop"
+                alt="Workspace" class="w-full h-full object-cover opacity-50">
             <div class="absolute inset-0 bg-gradient-to-t from-bike-dark via-transparent to-bike-dark/30"></div>
         </div>
 
         <div class="relative z-10 p-12 text-left text-white max-w-lg mt-auto mb-16">
-            <h1 class="text-4xl font-bold mb-4 tracking-tight leading-tight">데이터로 만드는<br>더 나은 자전거 인프라.</h1>
+            <h1 class="text-4xl font-bold mb-4 tracking-tight leading-tight">정확한 정보 관리는<br>신뢰받는 행정의 기본입니다.</h1>
             <p class="text-lg text-slate-200 leading-relaxed font-medium mb-8">
-                단순한 현황 파악을 넘어 구역별 수요를 예측하고,<br>
-                시민들에게 더 쾌적한 따릉이 이용 환경을<br>제공하기 위한 자치구 관리자 전용 대시보드입니다.
+                계정 정보를 안전하게 최신화하여 원활하게 대시보드를 관리하세요.<br>
+                주기적인 비밀번호 변경은 보안을 강력하게 유지합니다.
             </p>
-
-            <div class="flex gap-4 items-center">
-                <div class="flex -space-x-4">
-                    <img class="w-10 h-10 rounded-full border-2 border-slate-800 object-cover"
-                        src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" alt="User 1">
-                    <img class="w-10 h-10 rounded-full border-2 border-slate-800 object-cover"
-                        src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="User 2">
-                    <img class="w-10 h-10 rounded-full border-2 border-slate-800 object-cover"
-                        src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" alt="User 3">
-                    <div
-                        class="w-10 h-10 rounded-full border-2 border-slate-800 bg-slate-700 flex items-center justify-center text-xs font-bold text-white">
-                        +2k</div>
-                </div>
-                <div class="text-sm font-medium text-slate-300">
-                    서울시 25개 자치구 담당자들이 함께 관리하고 있습니다.
-                </div>
-            </div>
         </div>
     </div>
 
     <!-- UI Validation Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const useridInput = document.getElementById('userid');
-            const useridHint = document.getElementById('userid-hint');
-
             const passwordInput = document.getElementById('password');
             const passwordHint = document.getElementById('password-hint');
 
@@ -270,12 +277,6 @@
                     inputElement.classList.remove('border-bike-green', 'ring-bike-green');
                     inputElement.classList.add('border-red-500', 'ring-red-500');
                 }
-            }
-
-            if (useridInput) {
-                useridInput.addEventListener('blur', function () {
-                    updateHintStyle(this.value.length >= 6, useridHint, this, '아이디는 6자 이상 입력해주세요.');
-                });
             }
 
             if (passwordInput) {
@@ -309,6 +310,35 @@
             if (passwordConfirmInput) {
                 passwordConfirmInput.addEventListener('blur', checkPasswordMatch);
             }
+
+            // Modal Logic
+            window.openDeleteModal = function () {
+                const modal = document.getElementById('deleteModal');
+                const backdrop = document.getElementById('deleteModalBackdrop');
+                const panel = document.getElementById('deleteModalPanel');
+
+                modal.classList.remove('hidden');
+                // Allow browser to render display:block before transitioning opacity
+                setTimeout(() => {
+                    backdrop.classList.remove('opacity-0');
+                    panel.classList.remove('opacity-0', 'scale-95');
+                    panel.classList.add('opacity-100', 'scale-100');
+                }, 10);
+            };
+
+            window.closeDeleteModal = function () {
+                const modal = document.getElementById('deleteModal');
+                const backdrop = document.getElementById('deleteModalBackdrop');
+                const panel = document.getElementById('deleteModalPanel');
+
+                backdrop.classList.add('opacity-0');
+                panel.classList.remove('opacity-100', 'scale-100');
+                panel.classList.add('opacity-0', 'scale-95');
+
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300); // Matches Tailwind transition duration (300ms)
+            };
         });
     </script>
 </body>
