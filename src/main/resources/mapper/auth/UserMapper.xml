@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "mybatis-3-mapper.dtd">
+  "../mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.seoulbike.auth.dao.IMemberRepository">
+<mapper namespace="com.example.seoulbike.auth.dao.IUserRepository">
 
     <!-- 회원 가입 -->
-    <insert id="insertMember">
-        INSERT INTO member (userid, name, password, email, region, role)
+    <insert id="insertUser">
+        INSERT INTO user (userid, name, password, email, region, role)
         VALUES (#{userId}, #{name}, #{password}, #{email}, #{region}, #{role})
     </insert>
 
     <!-- 로그인 (특정 회원 조회) -->
-    <select id="findByUserId" resultType="Member">
+    <select id="findByUserId" resultType="User">
         SELECT userid AS userId, name, password, email, region, role
-        FROM member
+        FROM user
         WHERE userid = #{userid}
     </select>
 
     <!-- 전체 회원 조회 -->
-    <select id="selectAllMembers" resultType="Member">
+    <select id="selectAllUsers" resultType="User">
         SELECT userid AS userId, name, password, email, region, role
-        FROM member
+        FROM user
         ORDER BY userid
     </select>
 
     <!-- 회원 정보 수정 -->
-    <update id="updateMember">
-        UPDATE member
+    <update id="updateUser">
+        UPDATE user
         SET name = #{name},
             password = #{password},
             email = #{email},
@@ -36,15 +36,15 @@
     </update>
 
     <!-- 회원 삭제 -->
-    <delete id="deleteMember">
-        DELETE FROM member
+    <delete id="deleteUser">
+        DELETE FROM user
         WHERE userid = #{userId}
     </delete>
 
     <!-- 비밀번호 조회 -->
     <select id="getPassword" resultType="String">
         SELECT password
-        FROM member
+        FROM user
         WHERE userid = #{userid}
     </select>
 
