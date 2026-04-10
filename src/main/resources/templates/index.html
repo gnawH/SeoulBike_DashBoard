@@ -1,8 +1,56 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
-<body>
-	
-</body>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seoul Bike Dashboard</title>
+
+    <!-- FontAwesome & Fonts -->
+    <script>
+        window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- Plotly -->
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        bike: { green: '#32C358', light: '#EAF8EE', dark: '#1E293B', gray: '#F3F4F6', text: '#475569' }
+                    },
+                    backgroundImage: {
+                        'mesh': 'radial-gradient(at 0% 0%, rgba(50, 195, 88, 0.05) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(50, 195, 88, 0.05) 0px, transparent 50%)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { margin: 0; padding: 0; background-color: #F8FAFC; }
+        ::-webkit-scrollbar { display: none; }
+    </style>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
 </head>
+<body class="m-0 p-0 font-sans text-bike-text bg-[#F8FAFC] min-h-screen flex flex-col bg-mesh">
+
+    <!-- 회원일 때 (세션에 loginUser 객체가 존재할 경우) -->
+    <th:block th:if="${session.loginUser != null}">
+        <div th:replace="~{user :: content}"></div>
+    </th:block>
+
+    <!-- 비회원일 때 (세션에 loginUser 객체가 없을 경우) -->
+    <th:block th:unless="${session.loginUser != null}">
+        <div th:replace="~{guest :: content}"></div>
+    </th:block>
+
+</body>
 </html>

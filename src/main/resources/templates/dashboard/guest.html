@@ -1,39 +1,590 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<body>
-	<header>
-		<div>
-			<img>
-			<span>사이트명</span>
-		</div>
-		<div>
-			<button>언어 설정</button>
-			<button>알림</button>
-			<button>프로필</button>
-		</div>
-	</header>
-	<main>
-		<section>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-		</section>
-		<div>
-			<div></div>
-			<div></div>
-		</div>
-		<div>
-			<div></div>
-			<div></div>
-			<div></div>
-		</div>
-		<section>
-			
-		</section>
-	</main>
-	
-</body>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seoul Bike - Guest Page</title>
+    <!-- FontAwesome & Fonts -->
+    <script>window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Plotly -->
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <!-- Tailwind CSS & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        bike: { green: '#32C358', light: '#EAF8EE', dark: '#1E293B', gray: '#F3F4F6', text: '#475569' }
+                    },
+                    backgroundImage: {
+                        'mesh': 'radial-gradient(at 0% 0%, rgba(50, 195, 88, 0.05) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(50, 195, 88, 0.05) 0px, transparent 50%)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #F8FAFC;
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
 </head>
+
+<body>
+    <div th:fragment="content" class="flex flex-col w-full h-full">
+        <!-- Global Header (Top-aligned, Full-width) -->
+        <header
+            class="w-full bg-white border-b border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] px-8 py-4 flex items-center justify-between z-50 sticky top-0">
+            <!-- Logo / Brand -->
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 bg-bike-green rounded-xl flex items-center justify-center text-white shadow-[0_4px_12px_rgba(50,195,88,0.3)]">
+                    <i class="fa-solid fa-bicycle text-lg"></i>
+                </div>
+                <span class="text-slate-900 font-bold text-xl tracking-tight">SeoulBike Analytics</span>
+            </div>
+
+            <!-- Right Utilities (Language & Notifications) -->
+            <div class="flex items-center gap-4">
+                <!-- Language Selector -->
+                <div class="relative">
+                    <button type="button" id="langToggleBtn"
+                        class="flex items-center gap-2 px-4 h-10 bg-slate-50 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-slate-100 text-sm font-medium text-slate-700 hover:border-bike-green transition-colors"
+                        onclick="document.getElementById('langDropdownMenu').classList.toggle('hidden')">
+                        <i class="fa-solid fa-globe text-slate-400 transition-colors"></i>
+                        <span>KO / EN</span>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
+                    </button>
+                    <div id="langDropdownMenu"
+                        class="hidden absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.08)] border border-slate-100 overflow-hidden z-50">
+                        <button type="button"
+                            class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 text-bike-green font-medium flex items-center justify-between">
+                            한국어
+                            <i class="fa-solid fa-check text-[10px]"></i>
+                        </button>
+                        <button type="button"
+                            class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 text-slate-600 transition-colors">
+                            English
+                        </button>
+                    </div>
+                </div>
+                <button
+                    class="flex items-center justify-center bg-bike-green hover:bg-green-600 text-white px-5 h-10 rounded-xl shadow-[0_4px_12px_rgba(50,195,88,0.3)] transition-colors font-bold text-sm"
+                    onclick="location.href='/login'">
+                    <span>로그인</span>
+                </button>
+
+                <button
+                    class="flex items-center justify-center bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 px-5 h-10 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-colors font-bold text-sm"
+                    onclick="location.href='/signup'">
+                    <span>회원가입</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 w-full max-w-[1440px] mx-auto p-8 flex flex-col gap-8">
+
+            <!-- KPI Summary Ribbon -->
+            <section id="kpi_summary_ribbon" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card 1: 탄소 절감량 -->
+                <div
+                    class="bg-white p-5 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden group hover:border-bike-green transition-colors cursor-default">
+                    <div class="flex justify-between items-start mb-4">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500">
+                            <i class="fa-solid fa-leaf text-lg"></i>
+                        </div>
+                        <span
+                            class="flex items-center text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
+                            <i class="fa-solid fa-tree mr-1"></i> 약 15만 그루
+                        </span>
+                    </div>
+                    <h3 class="text-slate-500 text-sm font-medium mb-1">2025년 총 탄소 절감량</h3>
+                    <div class="text-2xl font-bold text-slate-900 group-hover:text-bike-green transition-colors">2,450.5
+                        <span class="text-lg font-normal text-slate-500">ton</span>
+                    </div>
+                </div>
+
+                <!-- Card 2: 주행거리 -->
+                <div
+                    class="bg-white p-5 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden group hover:border-blue-400 transition-colors cursor-default">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500">
+                            <i class="fa-solid fa-route text-lg"></i>
+                        </div>
+                        <span class="text-xs font-medium text-slate-400">지구 둘레 362바퀴</span>
+                    </div>
+                    <h3 class="text-slate-500 text-sm font-medium mb-1">총 누적 주행거리</h3>
+                    <div class="text-2xl font-bold text-slate-900 group-hover:text-blue-500 transition-colors">
+                        14,500,210 <span class="text-lg font-normal text-slate-500">km</span></div>
+                </div>
+
+                <!-- Card 3: 핫플레이스 -->
+                <div
+                    class="bg-white p-5 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden group hover:border-orange-400 transition-colors cursor-default">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500">
+                            <i class="fa-solid fa-location-dot text-lg"></i>
+                        </div>
+                        <span
+                            class="flex items-center text-xs font-medium text-orange-500 bg-orange-50 px-2 py-1 rounded-full">
+                            <i class="fa-solid fa-fire mr-1"></i> 1000회 대여
+                        </span>
+                    </div>
+                    <h3 class="text-slate-500 text-sm font-medium mb-1">1년 전 오늘의 최고 인기 대여소</h3>
+                    <div class="text-2xl font-bold text-slate-900 group-hover:text-orange-500 transition-colors">여의나루역
+                        1번출구</div>
+                </div>
+
+                <!-- Card 4: 이용 시간 -->
+                <div
+                    class="bg-white p-5 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden group hover:border-purple-400 transition-colors cursor-default">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500">
+                            <i class="fa-solid fa-stopwatch text-lg"></i>
+                        </div>
+                        <span
+                            class="flex items-center text-xs font-medium text-bike-green bg-bike-light px-2 py-1 rounded-full">
+                            <i class="fa-solid fa-arrow-trend-up mr-1"></i> 전년 대비 +15%
+                        </span>
+                    </div>
+                    <h3 class="text-slate-500 text-sm font-medium mb-1">2025년 누적 이용 시간</h3>
+                    <div class="text-2xl font-bold text-slate-900 group-hover:text-purple-500 transition-colors">452,000
+                        <span class="text-lg font-normal text-slate-500">시간</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Usage Trends Chart -->
+                <div
+                    class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">기간별 따릉이 대여횟수</h2>
+                            <p class="text-sm text-slate-500">Rental Frequency by Period</p>
+                        </div>
+                        <div id="chartPeriodSelector"
+                            class="flex gap-1 bg-slate-50 p-1 rounded-lg border border-slate-100">
+                            <button
+                                class="px-3 py-1.5 text-xs font-medium bg-white text-slate-800 shadow-sm border border-slate-200 rounded-md transition-colors"
+                                onclick="updateUsageChart('daily', this)">일별</button>
+                            <button
+                                class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 border border-transparent rounded-md transition-colors"
+                                onclick="updateUsageChart('monthly', this)">월별</button>
+                            <button
+                                class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 border border-transparent rounded-md transition-colors hidden sm:block"
+                                onclick="updateUsageChart('quarterly', this)">분기별</button>
+                            <button
+                                class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 border border-transparent rounded-md transition-colors hidden sm:block"
+                                onclick="updateUsageChart('half-yearly', this)">반기별</button>
+                        </div>
+                    </div>
+                    <div id="usageTrendsChart" class="w-full h-[320px]"></div>
+                </div>
+
+                <!-- Top Stations by Users -->
+                <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-900">대여소 별 이용자 수</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">User Count by Station</p>
+                        </div>
+                        <select id="topStationsMonthFilter" onchange="updateTopStationsChart(this.value)"
+                            class="pl-3 pr-8 py-1.5 bg-slate-50 text-slate-700 text-xs sm:text-sm font-medium rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-bike-green cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394A3B8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-no-repeat bg-[position:right_10px_center]">
+                            <option value="all">2025년 전체</option>
+                            <option value="1">1월</option>
+                            <option value="2">2월</option>
+                            <option value="3">3월</option>
+                            <option value="4">4월</option>
+                            <option value="5">5월</option>
+                            <option value="6">6월</option>
+                            <option value="7">7월</option>
+                            <option value="8">8월</option>
+                            <option value="9">9월</option>
+                            <option value="10">10월</option>
+                            <option value="11">11월</option>
+                            <option value="12">12월</option>
+                        </select>
+                    </div>
+                    <div id="topStationsChart" class="w-full h-[320px]"></div>
+                </div>
+            </div>
+
+            <!-- Demographics & Regions Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Gender Ratio -->
+                <div
+                    class="bg-white p-6 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col">
+                    <div class="mb-6">
+                        <h2 class="text-base font-bold text-slate-900">이용자 성별 비율</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Gender Ratio of Users</p>
+                    </div>
+                    <div class="flex-1 flex flex-col justify-center items-center gap-6">
+                        <div class="flex items-end gap-8">
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="text-4xl text-blue-500"><i class="fa-solid fa-person"></i></div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-slate-900">58%</div>
+                                    <div class="text-xs text-slate-500">Male</div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="text-4xl text-pink-500"><i class="fa-solid fa-person-dress"></i></div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-slate-900">42%</div>
+                                    <div class="text-xs text-slate-500">Female</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-full flex h-2 rounded-full overflow-hidden mt-2">
+                            <div class="bg-blue-500 w-[58%]"></div>
+                            <div class="bg-pink-500 w-[42%]"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popular Regions Word Cloud -->
+                <div
+                    class="bg-white p-6 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden flex flex-col">
+                    <div class="mb-2 z-10 relative">
+                        <h2 class="text-base font-bold text-slate-900">지역별 이용분포</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Usage Distribution by Region</p>
+                    </div>
+                    <div class="flex-1 relative min-h-[200px] flex items-center justify-center">
+                        <div class="relative w-full h-full">
+                            <span
+                                class="absolute top-[20%] left-[30%] text-2xl font-bold text-bike-green opacity-90">Yeouido</span>
+                            <span
+                                class="absolute top-[40%] left-[10%] text-lg font-semibold text-slate-700 opacity-80">Gangnam</span>
+                            <span
+                                class="absolute top-[60%] left-[40%] text-xl font-bold text-bike-green opacity-70">Mapo</span>
+                            <span
+                                class="absolute top-[30%] right-[20%] text-lg font-medium text-slate-600 opacity-80">Jongno</span>
+                            <span
+                                class="absolute bottom-[20%] left-[20%] text-base text-slate-500 opacity-70">Seocho</span>
+                            <span
+                                class="absolute top-[50%] right-[10%] text-xl font-bold text-bike-green opacity-85">Songpa</span>
+                            <span class="absolute bottom-[30%] right-[30%] text-sm text-slate-400">Yongsan</span>
+                            <span class="absolute top-[10%] left-[50%] text-sm text-slate-500">Gwanak</span>
+                            <i
+                                class="fa-solid fa-bicycle absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[120px] text-slate-50 opacity-50 -z-10"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seasonal Distribution -->
+                <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                    <div class="flex justify-between items-center mb-2">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-900">계절별 이용분포</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Usage Distribution by Season</p>
+                        </div>
+                    </div>
+                    <div id="seasonalChart" class="w-full h-[220px]"></div>
+                </div>
+            </div>
+
+            <!-- Real-time Status Map Section -->
+            <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">실시간 따릉이 대여소별 거치율</h2>
+                        <div class="flex items-center gap-4 mt-1">
+                            <p class="text-sm text-slate-500">Real-time Station Occupancy Rate</p>
+                            <div class="flex items-center gap-3 text-xs">
+                                <span class="flex items-center gap-1.5"><span
+                                        class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> 거치율 과다 (회수 필요)</span>
+                                <span class="flex items-center gap-1.5"><span
+                                        class="w-2.5 h-2.5 rounded-full bg-red-500"></span> 거치율 부족 (보충 필요)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative h-[400px]">
+                    <div
+                        class="flex flex-col lg:flex-row gap-6 blur-[6px] pointer-events-none select-none opacity-50 h-full overflow-hidden">
+                        <div
+                            class="flex-1 h-[400px] rounded-xl overflow-hidden border border-slate-200 relative bg-slate-100">
+                            <img class="w-full h-full object-cover opacity-80 mix-blend-multiply"
+                                src="https://storage.googleapis.com/uxpilot-auth.appspot.com/e658ed3992-6a3b910a5736bd8c199c.png"
+                                alt="Map" />
+
+                            <div class="absolute inset-0">
+                                <div
+                                    class="absolute top-[30%] left-[45%] w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-md animate-pulse">
+                                </div>
+                                <div
+                                    class="absolute top-[45%] left-[35%] w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-md">
+                                </div>
+                                <div
+                                    class="absolute top-[60%] left-[55%] w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-md">
+                                </div>
+                                <div
+                                    class="absolute top-[25%] left-[60%] w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-md">
+                                </div>
+                                <div
+                                    class="absolute top-[50%] left-[70%] w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-md">
+                                </div>
+
+                                <div
+                                    class="absolute top-[40%] left-[20%] w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-md animate-pulse">
+                                </div>
+                                <div
+                                    class="absolute top-[70%] left-[40%] w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-md">
+                                </div>
+                                <div
+                                    class="absolute top-[15%] left-[30%] w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-md">
+                                </div>
+                                <div
+                                    class="absolute top-[55%] left-[25%] w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-md">
+                                </div>
+                                <div
+                                    class="absolute top-[80%] left-[65%] w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-md">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-full lg:w-[320px] flex flex-col gap-4">
+                            <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                                <h3 class="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
+                                    <i class="fa-solid fa-battery-full"></i> 회수 필요 대여소 Top 4
+                                </h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center text-sm">
+                                        <span class="text-slate-700 font-medium">1. 여의도역 1번출구 앞</span>
+                                        <span class="text-blue-600 font-bold">142%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-sm">
+                                        <span class="text-slate-700 font-medium">2. 홍대입구역 2번출구</span>
+                                        <span class="text-blue-600 font-bold">115%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-sm">
+                                        <span class="text-slate-700 font-medium">3. 강남역 11번출구 앞</span>
+                                        <span class="text-blue-600 font-bold">108%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-sm">
+                                        <span class="text-slate-700 font-medium">4. 건대입구역 2번출구</span>
+                                        <span class="text-blue-600 font-bold">103%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-red-50 rounded-xl p-4 border border-red-100">
+                                <h3 class="text-sm font-bold text-red-900 mb-3 flex items-center gap-2">
+                                    <i class="fa-solid fa-battery-empty"></i> 보충 필요 대여소 Top 4
+                                </h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center text-sm">
+                                        <span class="text-slate-700 font-medium">1. 서울숲 공원 입구</span>
+                                        <span class="text-red-600 font-bold">0%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-sm">
+                                        <span class="text-slate-700 font-medium">2. 올림픽공원 북문</span>
+                                        <span class="text-red-600 font-bold">2%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-sm">
+                                        <span class="text-slate-700 font-medium">3. 마포대교 남단</span>
+                                        <span class="text-red-600 font-bold">5%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-sm">
+                                        <span class="text-slate-700 font-medium">4. 뚝섬유원지역 1번출구</span>
+                                        <span class="text-red-600 font-bold">9%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Login Overlay -->
+                    <div class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                        <button onclick="location.href='/login'"
+                            class="pointer-events-auto bg-[#32C358]/95 backdrop-blur-md hover:bg-green-600 focus:ring-4 focus:ring-green-100 text-white font-bold py-4 px-10 rounded-full shadow-[0_8px_30px_rgba(50,195,88,0.4)] transform transition-all hover:scale-105 flex items-center justify-center gap-3 text-lg border border-white/20">
+                            <i class="fa-solid fa-lock opacity-90 text-base"></i>
+                            로그인하고 실시간 정보 확인하기
+                        </button>
+                    </div>
+                </div>
+        </main>
+
+        <script>
+            function initializeCharts() {
+                try {
+                    // Usage Trends Chart
+                    const usageTrace = {
+                        x: ['Oct 18', 'Oct 19', 'Oct 20', 'Oct 21', 'Oct 22', 'Oct 23', 'Oct 24'],
+                        y: [85000, 92000, 115000, 120000, 98000, 105000, 124592],
+                        type: 'scatter',
+                        mode: 'lines',
+                        fill: 'tozeroy',
+                        line: { color: '#32C358', width: 3, shape: 'spline', smoothing: 1.3 },
+                        fillcolor: 'rgba(50, 195, 88, 0.1)'
+                    };
+                    const usageLayout = {
+                        margin: { t: 10, r: 10, b: 30, l: 50 },
+                        plot_bgcolor: 'transparent',
+                        paper_bgcolor: 'transparent',
+                        xaxis: { showgrid: false, tickfont: { color: '#94A3B8', size: 11 }, linecolor: '#E2E8F0' },
+                        yaxis: { showgrid: true, gridcolor: '#F1F5F9', gridwidth: 1, tickfont: { color: '#94A3B8', size: 11 }, linecolor: 'transparent' },
+                        showlegend: false, hovermode: 'x unified'
+                    };
+                    Plotly.newPlot('usageTrendsChart', [usageTrace], usageLayout, { responsive: true, displayModeBar: false });
+
+                    // Top Stations Chart
+                    const topStationsTrace = {
+                        x: [15420, 12350, 11800, 9450, 8200],
+                        y: ['여의도공원    ', '뚝섬유원지    ', '홍대입구역    ', '강남역    ', '신촌역    '],
+                        type: 'bar', orientation: 'h',
+                        marker: { color: ['#32C358', '#4ADE80', '#86EFAC', '#BBF7D0', '#DCFCE7'], cornerRadius: 4 }
+                    };
+                    const topStationsLayout = {
+                        margin: { t: 10, r: 20, b: 30, l: 100 },
+                        plot_bgcolor: 'transparent', paper_bgcolor: 'transparent',
+                        xaxis: { showgrid: true, gridcolor: '#F1F5F9', tickfont: { color: '#94A3B8', size: 10 } },
+                        yaxis: { showgrid: false, tickfont: { color: '#475569', size: 11, weight: 'bold' }, autorange: 'reversed', tickpad: 15 }
+                    };
+                    Plotly.newPlot('topStationsChart', [topStationsTrace], topStationsLayout, { responsive: true, displayModeBar: false });
+
+                    // Seasonal Distribution
+                    const seasonalTrace = {
+                        values: [40, 25, 20, 15],
+                        labels: ['봄', '여름', '가을', '겨울'],
+                        type: 'pie', hole: 0.65,
+                        marker: { colors: ['#F59E0B', '#10B981', '#EF4444', '#3B82F6'] },
+                        textinfo: 'percent', textposition: 'inside', insidetextfont: { color: '#fff', size: 11 }, hoverinfo: 'label+percent'
+                    };
+                    const seasonalLayout = {
+                        margin: { t: 10, r: 10, b: 10, l: 10 },
+                        paper_bgcolor: 'transparent', showlegend: true,
+                        legend: { orientation: 'v', x: 1.1, y: 0.5, font: { size: 11, color: '#64748B' } }
+                    };
+                    Plotly.newPlot('seasonalChart', [seasonalTrace], seasonalLayout, { responsive: true, displayModeBar: false });
+
+                } catch (e) { console.error("Chart initialization failed", e); }
+            }
+
+            window.addEventListener('load', initializeCharts);
+            setTimeout(initializeCharts, 1200);
+
+            // Chart Update Logic
+            function updateUsageChart(period, btnElement) {
+                // 1. Update Buttons
+                const container = document.getElementById('chartPeriodSelector');
+                const buttons = container.querySelectorAll('button');
+
+                // Reset all to unselected
+                buttons.forEach(btn => {
+                    btn.classList.remove('bg-white', 'text-slate-800', 'shadow-sm', 'border-slate-200');
+                    btn.classList.add('text-slate-500', 'border-transparent');
+                });
+
+                // Set clicked button to selected
+                btnElement.classList.remove('text-slate-500', 'border-transparent');
+                btnElement.classList.add('bg-white', 'text-slate-800', 'shadow-sm', 'border-slate-200');
+
+                // 2. Update Data
+                let nx = [], ny = [];
+                if (period === 'daily') {
+                    nx = ['10/18', '10/19', '10/20', '10/21', '10/22', '10/23', '10/24'];
+                    ny = [85000, 92000, 115000, 120000, 98000, 105000, 124592];
+                } else if (period === 'monthly') {
+                    nx = ['5월', '6월', '7월', '8월', '9월', '10월'];
+                    ny = [2100000, 2400000, 2800000, 3100000, 3500000, 3200000];
+                } else if (period === 'quarterly') {
+                    nx = ['1분기', '2분기', '3분기', '4분기(예상)'];
+                    ny = [4500000, 7200000, 9400000, 8100000];
+                } else if (period === 'half-yearly') {
+                    nx = ['23년 상반기', '23년 하반기', '24년 상반기', '24년 하반기(예상)'];
+                    ny = [12000000, 14500000, 15200000, 17500000];
+                }
+
+                // Push new data to Plotly
+                Plotly.update('usageTrendsChart', {
+                    x: [nx],
+                    y: [ny]
+                });
+            }
+
+            function updateTopStationsChart(month) {
+                // Determine mock data based on month (or 'all')
+                let nx = [], ny = [];
+                if (month === 'all') {
+                    nx = [2100000, 1850000, 1450000, 1200000, 950000];
+                    ny = ['여의도공원    ', '뚝섬유원지    ', '홍대입구역    ', '강남역    ', '신촌역    '];
+                } else if (month === '4' || month === '5' || month === '9' || month === '10') {
+                    // Spring/Autumn hot spots
+                    nx = [342000, 280000, 210000, 195000, 152000];
+                    ny = ['여의나루역    ', '올림픽공원    ', '서울숲    ', '뚝섬유원지    ', '반포한강공원    '];
+                } else {
+                    // Default logic
+                    const base = parseInt(month) * 15000;
+                    nx = [base + 50000, base + 40000, base + 25000, base + 12000, base];
+                    ny = ['여의도공원    ', '강남역    ', '잠실역    ', '고속터미널역    ', '신도림역    '];
+                }
+
+                // Push new data to Plotly
+                Plotly.update('topStationsChart', { x: [nx], y: [ny] });
+            }
+
+            // Language Dropdown Logic
+            const langBtnToggle = document.getElementById('langToggleBtn');
+            const langMenuBox = document.getElementById('langDropdownMenu');
+
+            if (langBtnToggle && langMenuBox) {
+                const langOptions = langMenuBox.querySelectorAll('button');
+                langOptions.forEach(option => {
+                    option.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const selectedLang = this.textContent.trim().replace('KO / EN', '').trim();
+
+                        // Update button text span
+                        const langSpan = langBtnToggle.querySelector('span');
+                        if (langSpan) {
+                            langSpan.textContent = selectedLang;
+                        }
+
+                        // Reset all options to default state
+                        langOptions.forEach(opt => {
+                            opt.className = 'w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 text-slate-600 transition-colors flex items-center justify-between';
+                            opt.innerHTML = opt.textContent.trim(); // Remove any HTML (like icons) and keep only text
+                        });
+
+                        // Set chosen option to active state
+                        this.className = 'w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 text-bike-green font-medium flex items-center justify-between';
+                        this.innerHTML = `${selectedLang} <i class="fa-solid fa-check text-[10px]"></i>`;
+
+                        // Close menu
+                        langMenuBox.classList.add('hidden');
+                    });
+                });
+            }
+
+            // Close language dropdown when clicking outside
+            document.addEventListener('click', function (e) {
+                if (langBtnToggle && langMenuBox && !langBtnToggle.contains(e.target) && !langMenuBox.contains(e.target)) {
+                    langMenuBox.classList.add('hidden');
+                }
+            });
+        </script>
+    </div>
+</body>
+
 </html>
