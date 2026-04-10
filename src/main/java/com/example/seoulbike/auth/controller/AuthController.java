@@ -46,7 +46,6 @@ public class AuthController {
 		return "redirect:/auth/login";
 	}
 	
-	
     // 로그아웃
     @GetMapping("/logout")
     public String logout() {
@@ -54,15 +53,6 @@ public class AuthController {
         return "redirect:/";
     }
 	
-    // 회원 탈퇴 처리
-    @PostMapping("/deleteUser")
-    public String deleteUser(String password, Model model) {
-        // TODO: 세션/토큰 정보를 통해 현재 유저를 식별하고 입력받은 password가 일치하는지 확인 (Service 연동)
-        // boolean isMatched = AuthService.checkPassword(userId, password);
-        // if(isMatched) { AuthService.deleteUser(userId); return "redirect:/"; }
-        
-        // 현재는 서비스가 미연결 상태이므로 임시로 메인 화면으로 직행하도록 구현
-        return "redirect:/";
-    }
+	
 	
 }
