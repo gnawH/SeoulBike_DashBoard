@@ -57,4 +57,28 @@ public class AuthService implements IAuthService  {
                 .signWith(SignatureAlgorithm.HS256, "secretKey")
                 .compact();
     }
+
+	@Override
+	public void updateUser(Signup dto) {
+		User user = userMapper.findByUserId(dto.getUserId());
+		
+		if (user == null) {
+			throw new RuntimeException("사용자가 존재하지 않습니다");
+		}
+		//비밀번호 변경시 암호화 
+		if (dto.getPassword() != null) {
+			dto.setPassword(passwordEncoder.encode(dto.getPassword()));
+		}
+		userMapper.updateUser(dto);
+	}
+
+	@Override
+	public void deleteUser(String userId) {
+		User user = userMapper.findByUserId(userId);
+		
+		if (user == null) {
+			throw new RuntimeException("사용자가 존재하지 않습니다 ");
+		}
+		userMapper.deleteUser(userId);
+	}
 }

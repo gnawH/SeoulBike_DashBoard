@@ -15,12 +15,16 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import com.example.seoulbike.auth.service.IAuthService;
+
 @Controller
 public class AuthController {
 	
-	// 민호님 서비스 확인 후 연결 -> 우선 확인
-	@Autowired                                                                   
-	IAuthService authService;
+
+	// 민호님 서비스 확인 후 연결
+	@Autowired
+	IAuthService  AuthService;
+
 	
 	//로그인 페이지
 	@GetMapping("/login")
