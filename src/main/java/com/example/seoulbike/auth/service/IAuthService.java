@@ -9,4 +9,6 @@ public interface IAuthService {
     AuthResponse login(Login dto);
 
     void signup(Signup dto);
+
 }
+
