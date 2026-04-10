@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.seoulbike.auth.dao.UserMapper;
 import com.example.seoulbike.auth.model.AuthResponse;
@@ -25,13 +26,14 @@ public class AuthService implements IAuthService  {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public void signup(Signup dto) {
         if (userMapper.findByUserId(dto.getUserId()) != null) {
             throw new RuntimeException("이미 존재하는 아이디입니다");
         }
 
-        // 비밀번호 암호화 후 저장하는 로직은 추후 팀 정책에 맞게 연결하세요.
-        userMapper.insertMember(dto);
+        dto.setPassword(passwordEncoder.encode(dto.getPassword()));
+        userMapper.insertUser(dto);
     }
 
     public AuthResponse login(Login dto) {

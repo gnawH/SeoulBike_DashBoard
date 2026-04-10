@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.example.seoulbike.auth.model.AuthResponse;
 import com.example.seoulbike.auth.model.Login;
@@ -59,13 +60,14 @@ public class AuthController {
 	
 	// 회원가입 페이지
 	@GetMapping("/signup")
-	public String signupPage() {
+	public String signupPage(Model model) {
+		model.addAttribute("signupDto", new Signup());
 		return "auth/signup";
 	}
 	
 	//회원 가입 처리
 	@PostMapping("/signup")
-	public String signup(Signup signupDto, Model model) {
+	public String signup(@ModelAttribute("signupDto") Signup signupDto, Model model) {
 		
 		try {
 			//Todo: Service 연결 후 구현하기

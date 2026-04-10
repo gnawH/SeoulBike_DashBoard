@@ -8,7 +8,7 @@ import com.example.seoulbike.auth.model.User;
 @Mapper
 public interface UserMapper {
 	User findByUserId(String userId);
-	void insertMember(Signup dto);
+	void insertUser(Signup dto);
 	void updateUser(Signup dto);
 	void deleteUser(String userId);
 	}
