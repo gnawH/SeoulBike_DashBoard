@@ -1,18 +1,21 @@
 package com.example.seoulbike.auth.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.seoulbike.auth.service.IAuthService;
+
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
 	
 	// 민호님 서비스 확인 후 연결
-	//@Autowired
-	//IAuthService  AuthService;
+	@Autowired
+	IAuthService  AuthService;
 	
 	//로그인 페이지
 	@GetMapping("/login")

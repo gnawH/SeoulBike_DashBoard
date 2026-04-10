@@ -21,17 +21,13 @@ public class SecuriryConfig {
 	}
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
-			.csrf(csrf -> csrf.disable())
-			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/auth/**", "/", "/css/**", "/js/**", "/images/**").permitAll()
-				.anyRequest().authenticated()
-			)
-			.addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-			.formLogin(form -> form.disable())
-			.httpBasic(basic -> basic.disable());
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable()) // CSRF 끄기
+            .authorizeHttpRequests(auth -> auth
+                .anyRequest().permitAll() // 모든 요청 허용
+            );
 
-		return http.build();
-	}
+        return http.build();
+    }
 }
