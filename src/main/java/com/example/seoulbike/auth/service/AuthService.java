@@ -15,7 +15,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
-public class AuthService {
+public class AuthService implements IAuthService  {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
