@@ -13,4 +13,5 @@ public class Signup {
     private String name;
     private String email;
     private String region;
+    private String role = "USER";
 }

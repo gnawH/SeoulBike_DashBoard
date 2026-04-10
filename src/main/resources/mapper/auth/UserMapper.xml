@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "../mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.seoulbike.auth.dao.IUserRepository">
+<mapper namespace="com.example.seoulbike.auth.dao.UserMapper">
 
     <!-- 회원 가입 -->
     <insert id="insertUser">

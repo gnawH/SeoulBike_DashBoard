@@ -66,7 +66,7 @@
               Note: action="/auth/signup" method="post" is standard Spring Boot. 
               Since you are testing UI locally, the action will try to POST to standard browser handlers.
             -->
-            <form action="/auth/signup" method="post" class="space-y-4">
+            <form th:action="@{/signup}" th:object="${signupDto}" method="post" class="space-y-4">
 
                 <div>
                     <label for="userid" class="block text-sm font-bold text-slate-700 mb-1.5"><span
@@ -75,7 +75,7 @@
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fa-regular fa-id-badge text-slate-300"></i>
                         </div>
-                        <input type="text" id="userid" name="userid" placeholder="아이디를 입력해주세요." minlength="6"
+                        <input type="text" th:field="*{userId}" placeholder="아이디를 입력해주세요." minlength="6"
                             title="아이디는 6자 이상이어야 합니다."
                             class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium"
                             required>
@@ -91,7 +91,7 @@
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fa-regular fa-user text-slate-300"></i>
                         </div>
-                        <input type="text" id="name" name="name" placeholder="홍길동"
+                        <input type="text" th:field="*{name}" placeholder="홍길동"
                             class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium"
                             required>
                     </div>
@@ -104,7 +104,7 @@
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fa-solid fa-lock text-slate-300"></i>
                         </div>
-                        <input type="password" id="password" name="password" placeholder="영문 대/소문자, 숫자, 특수문자 포함"
+                        <input type="password" th:field="*{password}" placeholder="영문 대/소문자, 숫자, 특수문자 포함"
                             pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+"
                             title="비밀번호는 영문 대문자, 소문자, 숫자, 특수문자를 모두 포함해야 합니다."
                             class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium"
@@ -138,7 +138,7 @@
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fa-regular fa-envelope text-slate-300"></i>
                         </div>
-                        <input type="email" id="email" name="email" placeholder="seoulbike@example.com"
+                        <input type="email" th:field="*{email}" placeholder="seoulbike@example.com"
                             class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium"
                             required>
                     </div>
@@ -151,7 +151,7 @@
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fa-solid fa-map-location-dot text-slate-300"></i>
                         </div>
-                        <select id="region" name="region" required
+                        <select th:field="*{region}" required
                             class="block w-full pl-11 pr-8 py-3 bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium appearance-none cursor-pointer">
                             <option value="" disabled selected>담당 지역을 선택하세요</option>
                             <option value="강남구">강남구</option>
@@ -197,8 +197,7 @@
             <div class="mt-8 text-center pt-6 border-t border-slate-100">
                 <p class="text-sm text-slate-600 font-medium">
                     이미 계정이 있으신가요?
-                    <a href="login"
-                        class="font-bold text-bike-green hover:underline ml-1">로그인하러 가기</a>
+                    <a href="login" class="font-bold text-bike-green hover:underline ml-1">로그인하러 가기</a>
                 </p>
             </div>
         </div>
@@ -242,7 +241,8 @@
     <!-- UI Validation Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const useridInput = document.getElementById('userid');
+            // Note: Thymeleaf generates id matching field name. e.g. th:field="*{userId}" generates id="userId"
+            const useridInput = document.getElementById('userId');
             const useridHint = document.getElementById('userid-hint');
 
             const passwordInput = document.getElementById('password');
