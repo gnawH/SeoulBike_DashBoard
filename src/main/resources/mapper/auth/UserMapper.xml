@@ -6,27 +6,27 @@
 
     <!-- 회원 가입 -->
     <insert id="insertUser">
-        INSERT INTO user (userid, name, password, email, region, role)
+        INSERT INTO "USER" (userid, name, password, email, region, role)
         VALUES (#{userId}, #{name}, #{password}, #{email}, #{region}, #{role})
     </insert>
 
     <!-- 로그인 (특정 회원 조회) -->
     <select id="findByUserId" resultType="User">
         SELECT userid AS userId, name, password, email, region, role
-        FROM user
+        FROM "USER"
         WHERE userid = #{userid}
     </select>
 
     <!-- 전체 회원 조회 -->
     <select id="selectAllUsers" resultType="User">
         SELECT userid AS userId, name, password, email, region, role
-        FROM user
+        FROM "USER"
         ORDER BY userid
     </select>
 
     <!-- 회원 정보 수정 -->
     <update id="updateUser">
-        UPDATE user
+        UPDATE "USER"
         SET name = #{name},
             password = #{password},
             email = #{email},
@@ -37,14 +37,14 @@
 
     <!-- 회원 삭제 -->
     <delete id="deleteUser">
-        DELETE FROM user
+        DELETE FROM "USER"
         WHERE userid = #{userId}
     </delete>
 
     <!-- 비밀번호 조회 -->
     <select id="getPassword" resultType="String">
         SELECT password
-        FROM user
+        FROM "USER"
         WHERE userid = #{userid}
     </select>
 
