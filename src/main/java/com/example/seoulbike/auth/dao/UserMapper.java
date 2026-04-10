@@ -9,5 +9,7 @@ import com.example.seoulbike.auth.model.User;
 public interface UserMapper {
 	User findByUserId(String userId);
 	void insertMember(Signup dto);
+	void updateUser(Signup dto);
+	void deleteUser(String userId);
 	}
 
