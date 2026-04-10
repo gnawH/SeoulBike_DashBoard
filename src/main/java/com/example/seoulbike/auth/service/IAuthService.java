@@ -8,9 +8,11 @@ public interface IAuthService {
 
     AuthResponse login(Login dto);
 
+
     void signup(Signup dto); //회원가입
     
     void updateUser(Signup dto); //회원수정
     
     void deleteUser(String userId); //회원 탈퇴 
 }
+
