@@ -4,15 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.seoulbike.auth.model.AuthResponse;
 import com.example.seoulbike.auth.model.Login;
 import com.example.seoulbike.auth.model.Signup;
-import com.example.seoulbike.auth.service.AuthService;
 import com.example.seoulbike.auth.service.IAuthService;
-
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,10 +21,9 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class AuthController {
 	
-
 	// 민호님 서비스 확인 후 연결
 	@Autowired
-	IAuthService AuthService;
+	IAuthService authService;
 
 	
 	//로그인 페이지
@@ -33,13 +31,14 @@ public class AuthController {
 	public String loginpage() {
 		return "auth/login";
 	}
+
 	
 	//로그인 처리
 	@PostMapping("/login")
 	public String login(Login loginDto,HttpSession session,HttpServletResponse response,Model model) {
 		try {
 			// JWT Service 연결
-			AuthResponse result = AuthService.login(loginDto);
+			AuthResponse result = authService.login(loginDto);
 			
 			//JWT 쿠키 저장
 			Cookie cookie = new Cookie("JWT", result.getToken());
@@ -71,7 +70,7 @@ public class AuthController {
 		
 		try {
 			//Todo: Service 연결 후 구현하기
-			AuthService.signup(signupDto);
+			authService.signup(signupDto);
 			return "redirect:/login";
 		}catch(RuntimeException e) {
 			model.addAttribute("message", e.getMessage());
@@ -99,6 +98,70 @@ public class AuthController {
         return "redirect:/";
     }
 	
-	
+    //회원정보 수정 페이지
+    @GetMapping("/updateUser")
+    public String updateUserPage(HttpSession session, Model model) {
+    	AuthResponse loginUser = (AuthResponse) session.getAttribute("loginUser");
+    	
+    	if (loginUser == null) {
+    		return "redirect:/login";
+    	}
+    	model.addAttribute("loginUser", loginUser);
+    	return "auth/updateUser";
+    }
+    
+    //회원정보 수정 처리
+    @PostMapping("/auth/update")
+    public String updateUser(Signup signupDto, HttpSession session, Model model) {
+    	AuthResponse loginUser = (AuthResponse) session.getAttribute("loginUser");
+    	
+    	if (loginUser == null) {
+    		return "redirect:/login";
+    	}
+    	try {
+    		authService.updateUser(signupDto);
+    		return "redirect:/";
+    	}catch (RuntimeException e) {
+            model.addAttribute("message", e.getMessage());
+            return "auth/updateUser";
+        }catch (Exception e) {
+            model.addAttribute("message", "UPDATE_FAIL");
+            return "auth/updateUser";
+        }
+    }
+    
+    //회원정보 삭제 처리
+    @PostMapping("/deleteUser")
+    public String deleteUser(@RequestParam("password") String password, HttpSession session, 
+    		HttpServletResponse response, Model model) {
+    	AuthResponse loginUser = (AuthResponse) session.getAttribute("loginUser");
+    	
+    	if (loginUser == null) {
+    		return "redirect:/login";
+    	}
+    	try {
+    		// 비밀번호 검증 후 삭제
+            authService.deleteUser(loginUser.getUserId(), password);
+            
+            // JWT 쿠키 삭제 
+        	Cookie cookie = new Cookie("JWT", null);
+        	cookie.setHttpOnly(true);   
+        	cookie.setSecure(false);
+        	cookie.setPath("/");
+        	cookie.setMaxAge(0);
+        	response.addCookie(cookie);
+        	
+        	//세션 종료
+        	session.invalidate();
+        	return "redirect:/"; 
+            
+    	}catch (RuntimeException e) {
+            model.addAttribute("message", e.getMessage());
+            return "auth/updateUser";
+        } catch (Exception e) {
+            model.addAttribute("message", "DELETE_FAIL");
+            return "auth/updateUser";
+        }
+    }
 	
 }
