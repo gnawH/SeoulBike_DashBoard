@@ -2,6 +2,7 @@ package com.example.seoulbike.auth.service;
 
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,9 @@ public class AuthService implements IAuthService  {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    
+    @Value("${jwt.secret}") 
+    private String secretKey;
 
     public AuthService(UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userMapper = userMapper;
@@ -47,7 +51,7 @@ public class AuthService implements IAuthService  {
         }
 
         String token = generateToken(user);
-        return new AuthResponse(token, "로그인 성공", true);
+        return new AuthResponse(token, "로그인 성공", true, user.getUserId());
     }
 
     private String generateToken(User user) {
@@ -56,7 +60,7 @@ public class AuthService implements IAuthService  {
                 .claim("role", user.getRole())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60))
-                .signWith(SignatureAlgorithm.HS256, "secretKey")
+                .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
@@ -75,12 +79,17 @@ public class AuthService implements IAuthService  {
 	}
 
 	@Override
-	public void deleteUser(String userId) {
+	public void deleteUser(String userId, String password) {
 		User user = userMapper.findByUserId(userId);
 		
 		if (user == null) {
 			throw new RuntimeException("사용자가 존재하지 않습니다 ");
 		}
+		
+		//비밀번호 검증 로직 추가
+		if (!passwordEncoder.matches(password, user.getPassword())) {
+			throw new RuntimeException("비밀번호가 일치하지 않습니다");
+		}	
 		userMapper.deleteUser(userId);
 	}
 }

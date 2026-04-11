@@ -9,10 +9,12 @@ public class AuthResponse {
     private String token;         // JWT 토큰
     private String message;       // 응답 메시지
     private boolean success;      // 성공 여부
+    private String userId;
     
-    public AuthResponse(String token, String message, boolean success) {
+    public AuthResponse(String token, String message, boolean success, String userId) {
         this.token = token;
         this.message = message;
         this.success = success;
+        this.userId = userId;
     }
 }

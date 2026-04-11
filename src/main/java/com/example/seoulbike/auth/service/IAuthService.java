@@ -13,6 +13,6 @@ public interface IAuthService {
     
     void updateUser(Signup dto); //회원수정
     
-    void deleteUser(String userId); //회원 탈퇴 
+    void deleteUser(String userId, String password); //회원 탈퇴 
 }
 
