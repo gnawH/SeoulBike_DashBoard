@@ -50,32 +50,6 @@
             <i class="fa-solid fa-arrow-left"></i> <span th:text="#{update.back}">돌아가기</span>
         </button>
 
-        <!-- Language Selector -->
-        <div class="absolute top-8 right-8 relative z-10">
-            <button type="button" id="langToggleBtn"
-                class="flex items-center gap-2 px-4 h-10 bg-slate-50 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-slate-100 text-sm font-medium text-slate-700 hover:border-bike-green transition-colors"
-                onclick="document.getElementById('langDropdownMenu').classList.toggle('hidden')">
-                <i class="fa-solid fa-globe text-slate-400 transition-colors"></i>
-                <span th:text="${#locale.language == 'en' ? #messages.msg('header.lang.en.code') : #messages.msg('header.lang.ko.code')}">KO</span>
-                <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
-            </button>
-            <div id="langDropdownMenu"
-                class="hidden absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.08)] border border-slate-100 overflow-hidden z-50">
-                <a href="?lang=ko"
-                    th:classappend="${#locale.language != 'en'} ? 'text-bike-green font-bold' : 'text-slate-600'"
-                    class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 transition-colors flex items-center justify-between block">
-                    <span th:text="#{header.lang.ko}">한국어</span>
-                    <i th:if="${#locale.language != 'en'}" class="fa-solid fa-check text-[10px]"></i>
-                </a>
-                <a href="?lang=en"
-                    th:classappend="${#locale.language == 'en'} ? 'text-bike-green font-bold' : 'text-slate-600'"
-                    class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 transition-colors flex items-center justify-between block">
-                    <span th:text="#{header.lang.en}">English</span>
-                    <i th:if="${#locale.language == 'en'}" class="fa-solid fa-check text-[10px]"></i>
-                </a>
-            </div>
-        </div>
-
         <div class="w-full max-w-sm mt-12 mb-8">
             <div class="mb-10">
                 <div class="flex items-center gap-3 mb-4">
