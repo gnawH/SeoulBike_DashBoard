@@ -11,11 +11,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.seoulbike.auth.model.AuthResponse;
 import com.example.seoulbike.auth.model.Login;
 import com.example.seoulbike.auth.model.Signup;
+import com.example.seoulbike.auth.service.AuthService;
 import com.example.seoulbike.auth.service.IAuthService;
 
+
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.Map;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 
 @Controller
@@ -163,5 +168,4 @@ public class AuthController {
             return "auth/updateUser";
         }
     }
-	
 }
