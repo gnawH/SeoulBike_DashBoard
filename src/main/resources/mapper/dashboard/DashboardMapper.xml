@@ -129,6 +129,20 @@
     </select>
 
     <!-- 지역별 이용 분포 -->
+    <select id="selectWordCloudByRegion"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultType="com.example.seoulbike.dashboard.model.DashboardWordCloudItem">
+        SELECT
+            R.REGION AS stationName,
+            SUM(S.NUM_OF_USES) AS rentCount
+        FROM SEOUL_BIKE S
+        JOIN RENTAL_OFFICE_INFO R ON S.RENTAL_OFFICE_NO = R.RENTAL_OFFICE_NO
+        WHERE S.RENTAL_DATE = ADD_MONTHS(TRUNC(SYSDATE), -12)
+        GROUP BY R.REGION
+        ORDER BY rentCount DESC
+    </select>
+
+    <!-- 지역별 이용 분포
     <select id="selectRegionUsageDistribution"
             parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
             resultMap="regionUsageResultMap">
@@ -143,7 +157,7 @@
             WHERE YEAR_VAL = #{year}
         )
         ORDER BY RANK_NO
-    </select>
+    </select> -->
 
     <!-- 계절별 이용 분포 -->
     <select id="selectSeasonUsageDistribution"
@@ -156,30 +170,6 @@
         FROM DASHBOARD_SEASON_USAGE
         WHERE YEAR_VAL = #{year}
         ORDER BY SEASON_ORDER
-    </select>
-
-    <!-- 실시간 거치율 지도 데이터 -->
-    <select id="selectRealtimeStationOccupancy"
-            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
-            resultMap="stationOccupancyResultMap">
-        SELECT
-            O.STATION_ID,
-            O.STATION_NAME,
-            M.REGION_NAME,
-            O.LATITUDE,
-            O.LONGITUDE,
-            O.OCCUPANCY_RATE,
-            CASE
-                WHEN O.OCCUPANCY_RATE > NVL(#{occupancyThreshold}, 100) THEN 'OVER'
-                ELSE 'UNDER'
-            END AS OCCUPANCY_STATUS
-        FROM DASHBOARD_STATION_OCCUPANCY O
-        JOIN STATION_REGION_MAP M
-          ON O.STATION_ID = M.STATION_ID
-        WHERE O.LAST_UPDATED_AT = (
-            SELECT MAX(LAST_UPDATED_AT) FROM DASHBOARD_STATION_OCCUPANCY
-        )
-                    AND (#{regionName} IS NULL OR M.REGION_NAME = #{regionName})
     </select>
 
     <!-- 로그인 사용자의 구 기준 거치율 상위 N개 -->

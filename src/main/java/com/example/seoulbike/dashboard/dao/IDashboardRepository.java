@@ -12,7 +12,7 @@ import com.example.seoulbike.dashboard.model.DashboardSeasonUsage;
 import com.example.seoulbike.dashboard.model.DashboardStationOccupancy;
 import com.example.seoulbike.dashboard.model.DashboardStationUsage;
 import com.example.seoulbike.dashboard.model.DashboardTrendPoint;
-//import com.example.seoulbike.dashboard.model.DashboardWordCloudItem;
+import com.example.seoulbike.dashboard.model.DashboardWordCloudItem;
 
 /**
  * IDashboardRepository
@@ -70,5 +70,5 @@ public interface IDashboardRepository {
     List<DashboardStationOccupancy> selectUnderOccupiedStations(DashboardQueryFilter filter);
 
     /** 담당구 기준 워드클라우드 데이터 조회 */
-//    List<DashboardWordCloudItem> selectWordCloudByRegion(DashboardQueryFilter filter);
+    List<DashboardWordCloudItem> selectWordCloudByRegion(DashboardQueryFilter filter);
 }
