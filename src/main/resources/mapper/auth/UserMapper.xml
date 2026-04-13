@@ -40,6 +40,13 @@
         DELETE FROM "USER"
         WHERE userid = #{userId}
     </delete>
+    
+	    <!-- 비밀번호 변경 -->
+	<update id="updatePassword">
+	    UPDATE "USER"
+	    SET password = #{password}
+	    WHERE userid = #{userId}
+	</update>
 
     <!-- 비밀번호 조회 -->
     <select id="getPassword" resultType="String">

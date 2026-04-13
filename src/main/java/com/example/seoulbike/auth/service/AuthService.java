@@ -41,7 +41,15 @@ public class AuthService implements IAuthService {
 
     // 추가한 비밀번호 재확인 검증 메서드
     public void verifyPasswordWithSecurity(String userId, String password) {
-
+    	User user = userMapper.findByUserId(userId);
+    	
+    	if (user == null) {
+    		throw new RuntimeException("사용자가 존재하지 않습니다");
+    	}
+    	
+    	 if (!passwordEncoder.matches(password, user.getPassword())) {
+    	        throw new RuntimeException("비밀번호가 일치하지 않습니다");
+    	 }
     }
 
     // signup
@@ -118,10 +126,7 @@ public class AuthService implements IAuthService {
         if (user == null) {
             throw new RuntimeException("사용자가 존재하지 않습니다");
         }
-        // 비밀번호 변경시 암호화
-        if (password != null) {
-            password = passwordEncoder.encode(password);
-        }
+       
         String encodedPassword = passwordEncoder.encode(password);
 
         userMapper.updatePassword(userId, encodedPassword);

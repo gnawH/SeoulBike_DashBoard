@@ -1,5 +1,7 @@
 package com.example.seoulbike.auth.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -7,17 +9,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.seoulbike.auth.model.AuthResponse;
 import com.example.seoulbike.auth.model.Login;
 import com.example.seoulbike.auth.model.Signup;
 import com.example.seoulbike.auth.service.IAuthService;
 
-
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
 
 @Controller
 public class AuthController {
@@ -101,13 +102,17 @@ public class AuthController {
 	
     //회원정보 수정 페이지
     @GetMapping("/updateUser")
-    public String updateUserPage(HttpSession session, Model model) {
+    public String updateUserPage(HttpSession session, Model model, @RequestParam(name = "status", required = false) 
+    String status) {
     	AuthResponse loginUser = (AuthResponse) session.getAttribute("loginUser");
     	
     	if (loginUser == null) {
     		return "redirect:/login";
     	}
     	model.addAttribute("loginUser", loginUser);
+    	if (status != null) {
+    	    model.addAttribute("status", status);
+    	}
     	return "auth/updateUser";
     }
     
@@ -163,5 +168,45 @@ public class AuthController {
             model.addAttribute("message", "DELETE_FAIL");
             return "auth/updateUser";
         }
+    }
+    
+    //비밀번호 검증 -> updateUser.html 자바 스크립트 부분
+    @PostMapping("/api/auth/verify-password")
+    @ResponseBody
+    public Map<String, Boolean> verifyPassword(@RequestParam("password") String password,
+            HttpSession session){
+    	AuthResponse loginUser = (AuthResponse) session.getAttribute("loginUser");
+    	
+    	if (loginUser == null) {
+    		return Map.of("success", false); // 키 값 (success, false)로 반환
+    	}
+    	try {
+    		authService.verifyPasswordWithSecurity(loginUser.getUserId(), password);
+    		return Map.of("success", true);
+    	}catch(Exception e) {
+    		return Map.of("success", false);
+    	}
+    }
+    
+    //비밀번호 재설정
+    @PostMapping("/auth/reset-password")
+    public String resetPassword(@RequestParam("newPassword") String newPassword, HttpSession session, Model model) {
+    	AuthResponse loginUser = (AuthResponse) session.getAttribute("loginUser");
+    	
+    	if (loginUser == null) {
+            return "redirect:/login";
+        }
+    	try {
+    		authService.updatePassword(loginUser.getUserId(), newPassword);
+    		return "redirect:/updateUser?status=RESET_SUCCESS";
+    	}catch (RuntimeException e) {
+            model.addAttribute("message", e.getMessage());
+            model.addAttribute("loginUser", loginUser);
+            return "auth/updateUser";
+    	}catch (Exception e) {
+            model.addAttribute("message", "RESET_FAIL");
+            model.addAttribute("loginUser", loginUser);
+            return "auth/updateUser";
+    	}
     }
 }
