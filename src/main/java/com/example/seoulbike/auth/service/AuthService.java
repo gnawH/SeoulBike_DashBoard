@@ -67,7 +67,8 @@ public class AuthService implements IAuthService {
         }
 
         String token = generateToken(user);
-        return new AuthResponse(token, "로그인 성공", true, user.getUserId());
+        return new AuthResponse(token, "로그인 성공", true, user.getUserId(),
+                user.getName(), user.getRegion(), user.getEmail());
     }
 
     private String generateToken(User user) {
