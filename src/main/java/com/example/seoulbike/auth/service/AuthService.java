@@ -17,12 +17,12 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
-public class AuthService implements IAuthService  {
+public class AuthService implements IAuthService {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    
-    @Value("${jwt.secret}") 
+
+    @Value("${jwt.secret}")
     private String secretKey;
 
     public AuthService(UserMapper userMapper, PasswordEncoder passwordEncoder) {
@@ -51,7 +51,8 @@ public class AuthService implements IAuthService  {
         }
 
         String token = generateToken(user);
-        return new AuthResponse(token, "로그인 성공", true, user.getUserId());
+        return new AuthResponse(token, "로그인 성공", true, user.getUserId(),
+                user.getName(), user.getRegion());
     }
 
     private String generateToken(User user) {
@@ -64,32 +65,32 @@ public class AuthService implements IAuthService  {
                 .compact();
     }
 
-	@Override
-	public void updateUser(Signup dto) {
-		User user = userMapper.findByUserId(dto.getUserId());
-		
-		if (user == null) {
-			throw new RuntimeException("사용자가 존재하지 않습니다");
-		}
-		//비밀번호 변경시 암호화 
-		if (dto.getPassword() != null) {
-			dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-		}
-		userMapper.updateUser(dto);
-	}
+    @Override
+    public void updateUser(Signup dto) {
+        User user = userMapper.findByUserId(dto.getUserId());
 
-	@Override
-	public void deleteUser(String userId, String password) {
-		User user = userMapper.findByUserId(userId);
-		
-		if (user == null) {
-			throw new RuntimeException("사용자가 존재하지 않습니다 ");
-		}
-		
-		//비밀번호 검증 로직 추가
-		if (!passwordEncoder.matches(password, user.getPassword())) {
-			throw new RuntimeException("비밀번호가 일치하지 않습니다");
-		}	
-		userMapper.deleteUser(userId);
-	}
+        if (user == null) {
+            throw new RuntimeException("사용자가 존재하지 않습니다");
+        }
+        // 비밀번호 변경시 암호화
+        if (dto.getPassword() != null) {
+            dto.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+        userMapper.updateUser(dto);
+    }
+
+    @Override
+    public void deleteUser(String userId, String password) {
+        User user = userMapper.findByUserId(userId);
+
+        if (user == null) {
+            throw new RuntimeException("사용자가 존재하지 않습니다 ");
+        }
+
+        // 비밀번호 검증 로직 추가
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다");
+        }
+        userMapper.deleteUser(userId);
+    }
 }
