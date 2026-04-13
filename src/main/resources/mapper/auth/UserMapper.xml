@@ -27,12 +27,16 @@
     <!-- 회원 정보 수정 -->
     <update id="updateUser">
         UPDATE "USER"
-        SET name = #{name},
-            password = #{password},
-            email = #{email},
-            region = #{region},
-            role = #{role}
-        WHERE userid = #{userId}
+        <set>
+            name = #{name, jdbcType=VARCHAR},
+            email = #{email, jdbcType=VARCHAR},
+            region = #{region, jdbcType=VARCHAR},
+            role = #{role, jdbcType=VARCHAR}
+            <if test="password != null and password != ''">
+                , password = #{password, jdbcType=VARCHAR}
+            </if>
+        </set>
+        WHERE userid = #{userId, jdbcType=VARCHAR}
     </update>
 
     <!-- 회원 삭제 -->
