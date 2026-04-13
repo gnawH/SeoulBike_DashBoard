@@ -56,7 +56,7 @@
                         class="flex items-center gap-2 px-4 h-10 bg-slate-50 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-slate-100 text-sm font-medium text-slate-700 hover:border-bike-green transition-colors"
                         onclick="document.getElementById('langDropdownMenu').classList.toggle('hidden')">
                         <i class="fa-solid fa-globe text-slate-400 transition-colors"></i>
-                        <span th:text="${#locale.language == 'en' ? #messages.msg('header.lang.en.code') : #messages.msg('header.lang.ko.code')}">KO</span>
+                        <span th:text="${#locale.language == 'en' ? #messages.msg('header.lang.en.code') : #messages.msg('header.lang.ko.code')}">한국어</span>
                         <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
                     </button>
                     <div id="langDropdownMenu"
