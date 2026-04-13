@@ -1,5 +1,7 @@
 package com.example.seoulbike.auth.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -7,26 +9,23 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.seoulbike.auth.model.AuthResponse;
 import com.example.seoulbike.auth.model.Login;
 import com.example.seoulbike.auth.model.Signup;
-import com.example.seoulbike.auth.service.AuthService;
 import com.example.seoulbike.auth.service.IAuthService;
-
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-
 @Controller
 public class AuthController {
 	
-
 	// 민호님 서비스 확인 후 연결
 	@Autowired
-	IAuthService AuthService;
+	IAuthService authService;
 
 	
 	//로그인 페이지
@@ -34,13 +33,14 @@ public class AuthController {
 	public String loginpage() {
 		return "auth/login";
 	}
+
 	
 	//로그인 처리
 	@PostMapping("/login")
 	public String login(Login loginDto,HttpSession session,HttpServletResponse response,Model model) {
 		try {
 			// JWT Service 연결
-			AuthResponse result = AuthService.login(loginDto);
+			AuthResponse result = authService.login(loginDto);
 			
 			//JWT 쿠키 저장
 			Cookie cookie = new Cookie("JWT", result.getToken());
@@ -61,25 +61,26 @@ public class AuthController {
 	
 	// 회원가입 페이지
 	@GetMapping("/signup")
-	public String signupPage() {
+	public String signupPage(Model model) {
+		model.addAttribute("signupDto", new Signup());
 		return "auth/signup";
 	}
 	
 	//회원 가입 처리
 	@PostMapping("/signup")
-	public String signup(Signup signupDto, Model model) {
+	public String signup(@ModelAttribute("signupDto") Signup signupDto, Model model) {
 		
 		try {
 			//Todo: Service 연결 후 구현하기
-			AuthService.signup(signupDto);
+			authService.signup(signupDto);
 			return "redirect:/login";
 		}catch(RuntimeException e) {
 			model.addAttribute("message", e.getMessage());
-            return "/signup";
+            return "auth/signup";
 		}
 		catch(Exception e){
 			model.addAttribute("message", "SIGNUP_FAIL");
-			return "/signup"; 
+			return "auth/signup"; 
 		}
 	}
 	
@@ -99,9 +100,6 @@ public class AuthController {
         return "redirect:/";
     }
 	
-	
-	
-}
     //회원정보 수정 페이지
     @GetMapping("/updateUser")
     public String updateUserPage(HttpSession session, Model model, @RequestParam(name = "status", required = false) 
@@ -211,3 +209,4 @@ public class AuthController {
             return "auth/updateUser";
     	}
     }
+}
