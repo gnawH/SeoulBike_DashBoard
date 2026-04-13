@@ -11,11 +11,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.seoulbike.auth.model.AuthResponse;
 import com.example.seoulbike.auth.model.Login;
 import com.example.seoulbike.auth.model.Signup;
+import com.example.seoulbike.auth.service.AuthService;
 import com.example.seoulbike.auth.service.IAuthService;
 
+
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.Map;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 
 @Controller
@@ -163,5 +168,34 @@ public class AuthController {
             return "auth/updateUser";
         }
     }
-	
+
+    // 비밀번호 검증 API (AJAX용)
+    @PostMapping("/api/auth/verify-password")
+    @ResponseBody
+    public Map<String, Object> verifyPassword(@RequestParam("password") String password, HttpSession session) {
+        AuthResponse loginUser = (AuthResponse) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return Map.of("success", false, "message", "로그인이 필요합니다.");
+        }
+        boolean isValid = authService.verifyPassword(loginUser.getUserId(), password);
+        return Map.of("success", isValid);
+    }
+
+    // 비밀번호 재설정 처리
+    @PostMapping("/auth/reset-password")
+    public String resetPassword(@RequestParam("newPassword") String newPassword, HttpSession session, Model model) {
+        AuthResponse loginUser = (AuthResponse) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/login";
+        }
+        try {
+            authService.resetPassword(loginUser.getUserId(), newPassword);
+            model.addAttribute("status", "RESET_SUCCESS");
+            return "auth/updateUser";
+        } catch (Exception e) {
+            model.addAttribute("message", "RESET_FAIL");
+            return "auth/updateUser";
+        }
+    }
+}
 }

@@ -58,8 +58,21 @@
                         <i class="fa-solid fa-user-pen text-lg"></i>
                     </div>
                 </div>
-                <h2 class="text-3xl font-bold text-slate-900 mb-2 tracking-tight" th:text="#{update.header}">회원정보 수정</h2>
+                <h2 class="text-3xl font-bold text-slate-900 mb-2 tracking-tight" th:text="#{update.header}">회원정보 수정
+                </h2>
                 <p class="text-sm text-slate-500 font-medium" th:text="#{update.desc}">계정 정보를 확인하고 수정할 수 있습니다.</p>
+
+                <!-- Success/Error Alerts -->
+                <div th:if="${status == 'RESET_SUCCESS'}"
+                    class="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-700 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <i class="fa-solid fa-circle-check text-lg"></i>
+                    <p class="text-sm font-bold" th:text="#{reset.modal.success}">비밀번호가 성공적으로 변경되었습니다.</p>
+                </div>
+                <div th:if="${message != null}"
+                    class="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <i class="fa-solid fa-circle-exclamation text-lg"></i>
+                    <p class="text-sm font-bold" th:text="${message}">오류가 발생했습니다.</p>
+                </div>
             </div>
 
             <form action="/auth/update" method="post" class="space-y-4">
@@ -71,43 +84,11 @@
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fa-regular fa-user text-slate-300"></i>
                         </div>
-                        <input type="text" id="name" name="name" th:placeholder="#{update.name.placeholder}" placeholder="홍길동"
+                        <input type="text" id="name" name="name" th:placeholder="#{update.name.placeholder}"
+                            placeholder="홍길동" th:value="${loginUser.name}"
                             class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium"
                             required>
                     </div>
-                </div>
-
-                <div>
-                    <label for="password" class="block text-sm font-bold text-slate-700 mb-1.5"><span
-                            class="text-red-500 mr-1">*</span><span th:text="#{update.password.new}">새로운 비밀번호</span></label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-lock text-slate-300"></i>
-                        </div>
-                        <input type="password" id="password" name="password" th:placeholder="#{update.password.placeholder}" placeholder="영문 대/소문자, 숫자, 특수문자 포함"
-                            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+"
-                            class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium"
-                            required>
-                    </div>
-                    <p id="password-hint" class="text-xs text-slate-500 mt-1.5 ml-1"><i
-                            class="fa-solid fa-circle-info mr-1"></i><span th:text="#{update.password.hint}">영문 대/소문자, 숫자, 특수문자를 모두 포함해야 합니다.</span></p>
-                </div>
-
-                <div>
-                    <label for="password_confirm" class="block text-sm font-bold text-slate-700 mb-1.5"><span
-                            class="text-red-500 mr-1">*</span><span th:text="#{update.password.confirm}">비밀번호 확인</span></label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-circle-check text-slate-300"></i>
-                        </div>
-                        <input type="password" id="password_confirm" name="password_confirm"
-                            th:placeholder="#{update.password.confirm.placeholder}"
-                            placeholder="위 비밀번호와 동일하게 입력" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+"
-                            class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium"
-                            required>
-                    </div>
-                    <p id="password-confirm-hint" class="text-xs text-slate-500 mt-1.5 ml-1 hidden"><i
-                            class="fa-solid fa-circle-info mr-1"></i></p>
                 </div>
 
                 <div>
@@ -118,6 +99,7 @@
                             <i class="fa-regular fa-envelope text-slate-300"></i>
                         </div>
                         <input type="email" id="email" name="email" placeholder="seoulbike@example.com"
+                            th:value="${loginUser.email}"
                             class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium"
                             required>
                     </div>
@@ -125,39 +107,19 @@
 
                 <div>
                     <label for="region" class="block text-sm font-bold text-slate-700 mb-1.5"><span
-                            class="text-red-500 mr-1">*</span><span th:text="#{update.region}">관할 지역 (소속구)</span></label>
+                            class="text-red-500 mr-1">*</span><span th:text="#{update.region}">관할 지역
+                            (소속구)</span></label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fa-solid fa-map-location-dot text-slate-300"></i>
                         </div>
                         <select id="region" name="region" required
                             class="block w-full pl-11 pr-8 py-3 bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium appearance-none cursor-pointer">
-                            <option value="" disabled selected th:text="#{update.region.placeholder}">담당 지역을 선택하세요</option>
-                            <option value="강남구">강남구</option>
-                            <option value="강동구">강동구</option>
-                            <option value="강북구">강북구</option>
-                            <option value="강서구">강서구</option>
-                            <option value="관악구">관악구</option>
-                            <option value="광진구">광진구</option>
-                            <option value="구로구">구로구</option>
-                            <option value="금천구">금천구</option>
-                            <option value="노원구">노원구</option>
-                            <option value="도봉구">도봉구</option>
-                            <option value="동대문구">동대문구</option>
-                            <option value="동작구">동작구</option>
-                            <option value="마포구">마포구</option>
-                            <option value="서대문구">서대문구</option>
-                            <option value="서초구">서초구</option>
-                            <option value="성동구">성동구</option>
-                            <option value="성북구">성북구</option>
-                            <option value="송파구">송파구</option>
-                            <option value="양천구">양천구</option>
-                            <option value="영등포구">영등포구</option>
-                            <option value="용산구">용산구</option>
-                            <option value="은평구">은평구</option>
-                            <option value="종로구">종로구</option>
-                            <option value="중구">중구</option>
-                            <option value="중랑구">중랑구</option>
+                            <option value="" disabled th:selected="${loginUser.region == null}"
+                                th:text="#{update.region.placeholder}">담당 지역을 선택하세요</option>
+                            <option
+                                th:each="r : ${ {'강남구', '강동구', '강북구', '강서구', '관악구', '광진구', '구로구', '금천구', '노원구', '도봉구', '동대문구', '동작구', '마포구', '서대문구', '서초구', '성동구', '성북구', '송파구', '양천구', '영등포구', '용산구', '은평구', '종로구', '중구', '중랑구'} }"
+                                th:value="${r}" th:text="${r}" th:selected="${r == loginUser.region}"></option>
                         </select>
                         <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                             <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
@@ -171,11 +133,19 @@
                         th:text="#{update.submit}">
                         수정 완료
                     </button>
-                    <button type="button" onclick="openDeleteModal()"
-                        class="w-full mt-3 flex justify-center items-center gap-2 py-3.5 px-4 border border-slate-200 rounded-xl text-sm font-bold text-slate-500 bg-white hover:bg-slate-50 hover:text-red-500 focus:outline-none transition-all"
-                        th:text="#{update.withdraw}">
-                        회원 탈퇴
-                    </button>
+
+                    <div class="grid grid-cols-2 gap-3 mt-3">
+                        <button type="button" onclick="openPasswordResetModal()"
+                            class="flex justify-center items-center gap-2 py-3.5 px-4 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 hover:border-bike-green hover:text-bike-green focus:outline-none transition-all">
+                            <i class="fa-solid fa-key text-xs opacity-70"></i>
+                            <span th:text="#{reset.modal.title}">비밀번호 재설정</span>
+                        </button>
+                        <button type="button" onclick="openDeleteModal()"
+                            class="flex justify-center items-center gap-2 py-3.5 px-4 border border-slate-200 rounded-xl text-sm font-bold text-slate-500 bg-white hover:bg-slate-50 hover:text-red-500 focus:outline-none transition-all"
+                            th:text="#{update.withdraw}">
+                            회원 탈퇴
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -199,17 +169,20 @@
                 <form action="/deleteUser" method="post">
                     <!-- Body -->
                     <div class="p-6">
-                        <p class="text-sm text-slate-600 mb-4 font-medium" th:text="#{withdraw.modal.desc}">안전한 탈퇴 처리를 위해 현재 비밀번호를 다시 한번 입력해 주세요. 탈퇴 시 모든
+                        <p class="text-sm text-slate-600 mb-4 font-medium" th:text="#{withdraw.modal.desc}">안전한 탈퇴 처리를
+                            위해 현재 비밀번호를 다시 한번 입력해 주세요. 탈퇴 시 모든
                             데이터가 삭제되며 복구할 수 없습니다.</p>
 
                         <div>
                             <label for="delete_password" class="block text-sm font-bold text-slate-700 mb-1.5"><span
-                                    class="text-red-500 mr-1">*</span><span th:text="#{withdraw.modal.password.label}">비밀번호 확인</span></label>
+                                    class="text-red-500 mr-1">*</span><span
+                                    th:text="#{withdraw.modal.password.label}">비밀번호 확인</span></label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     <i class="fa-solid fa-lock text-slate-300"></i>
                                 </div>
-                                <input type="password" id="delete_password" name="password" th:placeholder="#{withdraw.modal.password.placeholder}" placeholder="현재 비밀번호 입력"
+                                <input type="password" id="delete_password" name="password"
+                                    th:placeholder="#{withdraw.modal.password.placeholder}" placeholder="현재 비밀번호 입력"
                                     class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all font-medium"
                                     required>
                             </div>
@@ -234,6 +207,101 @@
         </div>
     </div>
 
+    <!-- Password Reset Modal -->
+    <div id="passwordResetModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity opacity-0"
+            id="pwdModalBackdrop"></div>
+        <div class="fixed inset-0 z-10 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md transform scale-95 opacity-0 transition-opacity transition-transform duration-300 relative overflow-hidden"
+                id="pwdModalPanel">
+
+                <!-- Header -->
+                <div class="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-bike-light text-bike-green flex items-center justify-center">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800" th:text="#{reset.modal.title}">비밀번호 재설정</h3>
+                </div>
+
+                <div class="p-6">
+                    <!-- Step 1: Verify Current Password -->
+                    <div id="pwdStep1" class="space-y-4">
+                        <p class="text-sm text-slate-600 font-medium" th:text="#{reset.modal.step1.desc}">보안을 위해 현재
+                            비밀번호를 먼저 확인합니다.</p>
+                        <div>
+                            <label for="current_password" class="block text-sm font-bold text-slate-700 mb-1.5"
+                                th:text="#{reset.modal.current.label}">현재 비밀번호</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-lock text-slate-300"></i>
+                                </div>
+                                <input type="password" id="current_password"
+                                    th:placeholder="#{reset.modal.current.placeholder}"
+                                    class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium">
+                            </div>
+                            <p id="current_password_error" class="text-xs text-red-500 mt-2 hidden">
+                                <i class="fa-solid fa-circle-xmark mr-1"></i>
+                                <span th:text="#{reset.modal.error.verify}">비밀번호가 일치하지 않습니다.</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Input New Password (Hidden by default) -->
+                    <form id="pwdResetForm" action="/auth/reset-password" method="post" class="hidden space-y-4">
+                        <p class="text-sm text-slate-600 font-medium" th:text="#{reset.modal.step2.desc}">새로운 비밀번호를 입력해
+                            주세요.</p>
+
+                        <div>
+                            <label for="new_password" class="block text-sm font-bold text-slate-700 mb-1.5"
+                                th:text="#{reset.modal.new.label}">새 비밀번호</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-lock-open text-slate-300"></i>
+                                </div>
+                                <input type="password" id="new_password" name="newPassword"
+                                    th:placeholder="#{reset.modal.new.placeholder}"
+                                    class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="new_password_confirm" class="block text-sm font-bold text-slate-700 mb-1.5"
+                                th:text="#{reset.modal.confirm.label}">새 비밀번호 확인</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-circle-check text-slate-300"></i>
+                                </div>
+                                <input type="password" id="new_password_confirm"
+                                    th:placeholder="#{reset.modal.confirm.placeholder}"
+                                    class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium"
+                                    required>
+                            </div>
+                            <p id="new_password_msg" class="text-xs mt-2 hidden"></p>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Footer -->
+                <div class="bg-slate-50 px-6 py-4 flex justify-end gap-3 rounded-b-2xl">
+                    <button type="button" onclick="closePasswordResetModal()"
+                        class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors focus:outline-none"
+                        th:text="#{withdraw.modal.cancel}">취소</button>
+
+                    <!-- Step 1 Button -->
+                    <button type="button" id="btnVerifyPwd" onclick="verifyCurrentPassword()"
+                        class="px-5 py-2.5 text-sm font-bold text-white bg-bike-green hover:bg-green-600 rounded-lg shadow-[0_4px_12px_rgba(50,195,88,0.2)] transition-all focus:outline-none"
+                        th:text="#{reset.modal.btn.verify}">확인</button>
+
+                    <!-- Step 2 Button (Hidden by default) -->
+                    <button type="submit" form="pwdResetForm" id="btnSubmitReset"
+                        class="hidden px-5 py-2.5 text-sm font-bold text-white bg-bike-green hover:bg-green-600 rounded-lg shadow-[0_4px_12px_rgba(50,195,88,0.2)] transition-all focus:outline-none"
+                        th:text="#{reset.modal.btn.submit}">비밀번호 변경 완료</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Right Side: Image/Branding Background -->
     <div class="hidden lg:flex lg:w-1/2 relative bg-slate-900 justify-center items-center overflow-hidden">
         <div class="absolute inset-0 z-0">
@@ -244,7 +312,8 @@
         </div>
 
         <div class="relative z-10 p-12 text-left text-white max-w-lg mt-auto mb-16">
-            <h1 class="text-4xl font-bold mb-4 tracking-tight leading-tight" th:utext="#{update.brand.desc}">정확한 정보 관리는<br>신뢰받는 행정의 기본입니다.</h1>
+            <h1 class="text-4xl font-bold mb-4 tracking-tight leading-tight" th:utext="#{update.brand.desc}">정확한 정보
+                관리는<br>신뢰받는 행정의 기본입니다.</h1>
             <p class="text-lg text-slate-200 leading-relaxed font-medium mb-8" th:utext="#{update.brand.subdesc}">
                 계정 정보를 안전하게 최신화하여 원활하게 대시보드를 관리하세요.<br>
                 주기적인 비밀번호 변경은 보안을 강력하게 유지합니다.
@@ -252,81 +321,28 @@
         </div>
     </div>
 
-    <!-- UI Validation Script -->
+    <!-- UI Validation & Modal Logic -->
     <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function () {
-            const passwordInput = document.getElementById('password');
-            const passwordHint = document.getElementById('password-hint');
-
-            const passwordConfirmInput = document.getElementById('password_confirm');
-            const passwordConfirmHint = document.getElementById('password-confirm-hint');
-
-            // 다국어 메시지 로드
-            const msgs = {
-                valid: [[#{update.password.valid}]],
-                hint: [[#{update.password.hint}]],
-                match: [[#{update.password.match}]],
-                mismatch: [[#{update.password.mismatch}]]
+            // == Global Modal Logic ==
+            const modals = {
+                delete: {
+                    id: 'deleteModal',
+                    backdrop: 'deleteModalBackdrop',
+                    panel: 'deleteModalPanel'
+                },
+                pwd: {
+                    id: 'passwordResetModal',
+                    backdrop: 'pwdModalBackdrop',
+                    panel: 'pwdModalPanel'
+                }
             };
 
-            function updateHintStyle(isValid, hintElement, inputElement, defaultText) {
-                if (inputElement.value.length === 0) {
-                    hintElement.className = "text-xs text-slate-500 mt-1.5 ml-1";
-                    hintElement.innerHTML = `<i class="fa-solid fa-circle-info mr-1"></i>${defaultText}`;
-                    inputElement.classList.remove('border-red-500', 'ring-red-500', 'border-bike-green', 'ring-bike-green');
-                    return;
-                }
-
-                if (isValid) {
-                    hintElement.className = "text-xs text-bike-green mt-1.5 ml-1";
-                    hintElement.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i>${msgs.valid}`;
-                    inputElement.classList.remove('border-red-500', 'ring-red-500');
-                    inputElement.classList.add('border-bike-green', 'ring-bike-green');
-                } else {
-                    hintElement.className = "text-xs text-red-500 mt-1.5 ml-1";
-                    hintElement.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i>${defaultText}`;
-                    inputElement.classList.remove('border-bike-green', 'ring-bike-green');
-                    inputElement.classList.add('border-red-500', 'ring-red-500');
-                }
-            }
-
-            if (passwordInput) {
-                passwordInput.addEventListener('blur', function () {
-                    const isValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/.test(this.value);
-                    updateHintStyle(isValid, passwordHint, this, msgs.hint);
-                    if (passwordConfirmInput.value.length > 0) checkPasswordMatch();
-                });
-            }
-
-            function checkPasswordMatch() {
-                if (passwordConfirmInput.value.length === 0) {
-                    passwordConfirmHint.classList.add('hidden');
-                    passwordConfirmInput.classList.remove('border-red-500', 'ring-red-500', 'border-bike-green', 'ring-bike-green');
-                    return;
-                }
-                passwordConfirmHint.classList.remove('hidden');
-                if (passwordInput.value === passwordConfirmInput.value) {
-                    passwordConfirmHint.className = "text-xs text-bike-green mt-1.5 ml-1";
-                    passwordConfirmHint.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i>${msgs.match}`;
-                    passwordConfirmInput.classList.remove('border-red-500', 'ring-red-500');
-                    passwordConfirmInput.classList.add('border-bike-green', 'ring-bike-green');
-                } else {
-                    passwordConfirmHint.className = "text-xs text-red-500 mt-1.5 ml-1";
-                    passwordConfirmHint.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i>${msgs.mismatch}`;
-                    passwordConfirmInput.classList.remove('border-bike-green', 'ring-bike-green');
-                    passwordConfirmInput.classList.add('border-red-500', 'ring-red-500');
-                }
-            }
-
-            if (passwordConfirmInput) {
-                passwordConfirmInput.addEventListener('blur', checkPasswordMatch);
-            }
-
-            // Modal Logic
-            window.openDeleteModal = function () {
-                const modal = document.getElementById('deleteModal');
-                const backdrop = document.getElementById('deleteModalBackdrop');
-                const panel = document.getElementById('deleteModalPanel');
+            function openModal(type) {
+                const m = modals[type];
+                const modal = document.getElementById(m.id);
+                const backdrop = document.getElementById(m.backdrop);
+                const panel = document.getElementById(m.panel);
 
                 modal.classList.remove('hidden');
                 setTimeout(() => {
@@ -334,12 +350,13 @@
                     panel.classList.remove('opacity-0', 'scale-95');
                     panel.classList.add('opacity-100', 'scale-100');
                 }, 10);
-            };
+            }
 
-            window.closeDeleteModal = function () {
-                const modal = document.getElementById('deleteModal');
-                const backdrop = document.getElementById('deleteModalBackdrop');
-                const panel = document.getElementById('deleteModalPanel');
+            function closeModal(type) {
+                const m = modals[type];
+                const modal = document.getElementById(m.id);
+                const backdrop = document.getElementById(m.backdrop);
+                const panel = document.getElementById(m.panel);
 
                 backdrop.classList.add('opacity-0');
                 panel.classList.remove('opacity-100', 'scale-100');
@@ -347,8 +364,89 @@
 
                 setTimeout(() => {
                     modal.classList.add('hidden');
+                    if (type === 'pwd') resetPwdModalState();
                 }, 300);
+            }
+
+            window.openDeleteModal = () => openModal('delete');
+            window.closeDeleteModal = () => closeModal('delete');
+            window.openPasswordResetModal = () => openModal('pwd');
+            window.closePasswordResetModal = () => closeModal('pwd');
+
+            // == Password Reset Logic ==
+            const pwdStep1 = document.getElementById('pwdStep1');
+            const pwdForm = document.getElementById('pwdResetForm');
+            const btnVerify = document.getElementById('btnVerifyPwd');
+            const btnSubmit = document.getElementById('btnSubmitReset');
+            const currentPwdInput = document.getElementById('current_password');
+            const newPwdInput = document.getElementById('new_password');
+            const confirmPwdInput = document.getElementById('new_password_confirm');
+            const pwdErrorMsg = document.getElementById('current_password_error');
+            const matchMsg = document.getElementById('new_password_msg');
+
+            const msgs = {
+                valid: [[#{ update.password.valid }]],
+                match: [[#{ update.password.match }]],
+                mismatch: [[#{ update.password.mismatch }]],
+                errVerify: [[#{ reset.modal.error.verify }]]
             };
+
+            function resetPwdModalState() {
+                pwdStep1.classList.remove('hidden');
+                pwdForm.classList.add('hidden');
+                btnVerify.classList.remove('hidden');
+                btnSubmit.classList.add('hidden');
+                currentPwdInput.value = '';
+                newPwdInput.value = '';
+                confirmPwdInput.value = '';
+                pwdErrorMsg.classList.add('hidden');
+                matchMsg.classList.add('hidden');
+            }
+
+            window.verifyCurrentPassword = async function () {
+                const pwd = currentPwdInput.value;
+                if (!pwd) return;
+
+                try {
+                    const response = await fetch('/api/auth/verify-password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `password=${encodeURIComponent(pwd)}`
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        pwdStep1.classList.add('hidden');
+                        pwdForm.classList.remove('hidden');
+                        btnVerify.classList.add('hidden');
+                        btnSubmit.classList.remove('hidden');
+                        pwdErrorMsg.classList.add('hidden');
+                    } else {
+                        pwdErrorMsg.classList.remove('hidden');
+                    }
+                } catch (e) {
+                    console.error('Verification failed', e);
+                }
+            };
+
+            // New password real-time validation
+            function checkPasswordMatch() {
+                if (!confirmPwdInput.value) {
+                    matchMsg.classList.add('hidden');
+                    return;
+                }
+                matchMsg.classList.remove('hidden');
+                if (newPwdInput.value === confirmPwdInput.value) {
+                    matchMsg.className = "text-xs text-bike-green mt-2";
+                    matchMsg.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i>${msgs.match}`;
+                } else {
+                    matchMsg.className = "text-xs text-red-500 mt-2";
+                    matchMsg.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i>${msgs.mismatch}`;
+                }
+            }
+
+            newPwdInput.addEventListener('input', checkPasswordMatch);
+            confirmPwdInput.addEventListener('input', checkPasswordMatch);
 
             // Close language dropdown when clicking outside
             document.addEventListener('click', function (e) {
