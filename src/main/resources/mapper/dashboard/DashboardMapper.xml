@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "../mybatis-3-mapper.dtd">
 
@@ -62,20 +62,31 @@
         <result property="occupancyStatus" column="OCCUPANCY_STATUS" />
     </resultMap>
 
-    <!-- 상단 KPI 조회 -->
+    <!-- 상단 KPI 조회 / 1년 전 오늘의 최고 인기 대여소 제외 -->
     <select id="selectDashboardKpi"
             parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
             resultMap="dashboardKpiResultMap">
         SELECT
-            2450.5 AS CARBON_REDUCTION_TON,
-            150000 AS TREE_EQUIVALENT_COUNT,
-            14500210 AS TOTAL_DISTANCE_KM,
-            362 AS EARTH_ROUNDS_EQUIVALENT,
-            '여의나루역 1번출구' AS TOP_STATION_NAME,
-            1000 AS TOP_STATION_RENT_COUNT,
-            452000 AS TOTAL_USAGE_HOURS,
-            15 AS YOY_GROWTH_RATE
-        FROM DUAL
+           	ROUND(SUM(CARBON_AMOUNT), 0) AS CARBON_REDUCTION_TON,
+            ROUND((SUM(CARBON_AMOUNT) * 1000) / 6.6, -6) / 10000000 AS TREE_EQUIVALENT_COUNT,
+            ROUND(ROUND(SUM(DISTANCE)/1000), 0) AS TOTAL_DISTANCE_KM,
+            ROUND(SUM(DISTANCE) / 40075, 0) AS EARTH_ROUNDS_EQUIVALENT,
+            ROUND(SUM(USAGE_MINUTE) / 60, 0) AS TOTAL_USAGE_HOURS
+        FROM SEOUL_BIKE
+    </select>
+    
+    <!-- 1년 전 오늘의 최고 인기 대여소 -->
+    <select id="bestRentalOffice"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultMap="dashboardKpiResultMap">
+        SELECT 
+            TRIM(SUBSTR(RENTAL_OFFICE_NAME, INSTR(RENTAL_OFFICE_NAME, '.') + 1)) AS TOP_STATION_NAME, 
+            SUM(NUM_OF_USES) AS TOP_STATION_RENT_COUNT
+        FROM SEOUL_BIKE
+        WHERE RENTAL_DATE = TRUNC(ADD_MONTHS(SYSDATE, -12))
+        GROUP BY RENTAL_OFFICE_NAME
+        ORDER BY TOP_STATION_RENT_COUNT DESC
+        FETCH FIRST 1 ROWS ONLY
     </select>
 
     <!-- 기간별 대여 횟수 조회 -->

@@ -129,12 +129,15 @@
                         </div>
                         <span
                             class="flex items-center text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
-                            <i class="fa-solid fa-tree mr-1"></i> <span th:text="#{kpi.carbon.badge}">약 15만 그루</span>
+                            <i class="fa-solid fa-tree mr-1"></i> <span
+                                th:text="|약 ${kpi.treeEquivalentCount}억 #{kpi.carbon.tree.unit} |">약
+                                15억 그루</span>
                         </span>
                     </div>
                     <h3 class="text-slate-500 text-sm font-medium mb-1" th:text="#{kpi.carbon.title}">2025년 총 탄소 절감량
                     </h3>
-                    <div class="text-2xl font-bold text-slate-900 group-hover:text-bike-green transition-colors">2,450.5
+                    <div class="text-2xl font-bold text-slate-900 group-hover:text-bike-green transition-colors">
+                        <span th:text="${#numbers.formatInteger(kpi.carbonReductionTon, 1, 'COMMA')}">2,451</span>
                         <span class="text-lg font-normal text-slate-500" th:text="#{kpi.carbon.unit}">ton</span>
                     </div>
                 </div>
@@ -145,13 +148,27 @@
                         <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500">
                             <i class="fa-solid fa-route text-lg"></i>
                         </div>
-                        <span class="text-xs font-medium text-slate-400" th:text="#{kpi.distance.badge}">지구 둘레
-                            362바퀴</span>
+                        <span class="text-xs font-medium text-slate-400">
+                            <span th:text="#{kpi.distance.earth.ref}">지구 둘레</span>
+
+                            <th:block th:if="${kpi.earthRoundsEquivalent >= 100000000}">
+                                <span
+                                    th:text="${#numbers.formatDecimal(kpi.earthRoundsEquivalent / 100000000.0, 1, 1)} + '억'">1.5억</span>
+                            </th:block>
+
+                            <th:block th:if="${kpi.earthRoundsEquivalent < 100000000}">
+                                <span
+                                    th:text="${#numbers.formatInteger(kpi.earthRoundsEquivalent, 0, 'COMMA')}">98,000,000</span>
+                            </th:block>
+
+                            <span th:text="#{kpi.distance.earth.unit}">바퀴</span>
+                        </span>
                     </div>
                     <h3 class="text-slate-500 text-sm font-medium mb-1" th:text="#{kpi.distance.title}">총 누적 주행거리</h3>
                     <div class="text-2xl font-bold text-slate-900 group-hover:text-blue-500 transition-colors">
-                        14,500,210 <span class="text-lg font-normal text-slate-500"
-                            th:text="#{kpi.distance.unit}">km</span></div>
+                        <span th:text="${#numbers.formatInteger(kpi.totalDistanceKm, 0, 'COMMA')}">14,500,210</span>
+                        <span class="text-lg font-normal text-slate-500" th:text="#{kpi.distance.unit}">km</span>
+                    </div>
                 </div>
                 <!-- Card 3 -->
                 <div
@@ -162,14 +179,15 @@
                         </div>
                         <span
                             class="flex items-center text-xs font-medium text-orange-500 bg-orange-50 px-2 py-1 rounded-full">
-                            <i class="fa-solid fa-fire mr-1"></i> <span th:text="#{kpi.hotplace.badge}">1000회 대여</span>
+                            <i class="fa-solid fa-fire mr-1"></i> <span
+                                th:text="|${#numbers.formatInteger(kpi.topStationRentCount, 0, 'COMMA')}#{kpi.hotplace.count.unit}|">1000회
+                                대여</span>
                         </span>
                     </div>
                     <h3 class="text-slate-500 text-sm font-medium mb-1" th:text="#{kpi.hotplace.title}">1년 전 오늘의 최고 인기
                         대여소</h3>
                     <div class="text-2xl font-bold text-slate-900 group-hover:text-orange-500 transition-colors"
-                        th:text="#{kpi.hotplace.value}">여의나루역
-                        1번출구</div>
+                        th:text="${kpi.topStationName}">여의나루역 1번출구</div>
                 </div>
                 <!-- Card 4 -->
                 <div
@@ -185,7 +203,8 @@
                         </span>
                     </div>
                     <h3 class="text-slate-500 text-sm font-medium mb-1" th:text="#{kpi.time.title}">2025년 누적 이용 시간</h3>
-                    <div class="text-2xl font-bold text-slate-900 group-hover:text-purple-500 transition-colors">452,000
+                    <div class="text-2xl font-bold text-slate-900 group-hover:text-purple-500 transition-colors">
+                        <span th:text="${#numbers.formatInteger(kpi.totalUsageHours, 0, 'COMMA')}">452,000</span>
                         <span class="text-lg font-normal text-slate-500" th:text="#{kpi.time.unit}">시간</span>
                     </div>
                 </div>
