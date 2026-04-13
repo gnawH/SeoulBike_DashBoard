@@ -16,5 +16,7 @@ public interface IAuthService {
 
     // 회원정보 수정 시 비밀번호 재확인
     void verifyPasswordWithSecurity(String userId, String password);
-
+    
+    // 비밀번호 업데이트
+    void updatePassword(String userId, String password);
 }
