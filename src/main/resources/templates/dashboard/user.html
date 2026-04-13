@@ -32,6 +32,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Plotly.js -->
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <!-- WordCloud2.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.2.2/wordcloud2.min.js"></script>
 </head>
 
 <body>
@@ -317,22 +319,7 @@
                     </div>
                     <div class="flex-1 relative min-h-[200px] flex items-center justify-center">
                         <div class="relative w-full h-full">
-                            <span
-                                class="absolute top-[20%] left-[30%] text-2xl font-bold text-bike-green opacity-90">Yeouido</span>
-                            <span
-                                class="absolute top-[40%] left-[10%] text-lg font-semibold text-slate-700 opacity-80">Gangnam</span>
-                            <span
-                                class="absolute top-[60%] left-[40%] text-xl font-bold text-bike-green opacity-70">Mapo</span>
-                            <span
-                                class="absolute top-[30%] right-[20%] text-lg font-medium text-slate-600 opacity-80">Jongno</span>
-                            <span
-                                class="absolute bottom-[20%] left-[20%] text-base text-slate-500 opacity-70">Seocho</span>
-                            <span
-                                class="absolute top-[50%] right-[10%] text-xl font-bold text-bike-green opacity-85">Songpa</span>
-                            <span class="absolute bottom-[30%] right-[30%] text-sm text-slate-400">Yongsan</span>
-                            <span class="absolute top-[10%] left-[50%] text-sm text-slate-500">Gwanak</span>
-                            <i
-                                class="fa-solid fa-bicycle absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[120px] text-slate-50 opacity-50 -z-10"></i>
+                            <canvas id="wordCloudCanvas" class="w-full h-full"></canvas>
                         </div>
                     </div>
                 </div>
@@ -479,6 +466,87 @@
                         legend: { orientation: 'v', x: 1.1, y: 0.5, font: { size: 11, color: '#64748B' } }
                     };
                     Plotly.newPlot('seasonalChart', [seasonalTrace], seasonalLayout, { responsive: true, displayModeBar: false });
+
+                    // Word Cloud Fetch
+                    fetch('/api/dashboard/wordcloud')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.length > 0) {
+                                const canvas = document.getElementById('wordCloudCanvas');
+                                canvas.width = canvas.offsetWidth || 300;
+                                canvas.height = canvas.offsetHeight || 200;
+
+                                const WORDCLOUD_WEIGHT_MODE = 'top-flat-tail-contrast';
+                                // const WORDCLOUD_WEIGHT_MODE = 'softmax';
+                                // const WORDCLOUD_WEIGHT_MODE = 'linear-ratio';
+
+                                function buildWordCloudList(rawData, mode) {
+                                    const minFont = 12;
+                                    const maxFont = 80;
+                                    const maxCount = Math.max(...rawData.map(item => item.rentCount));
+
+                                    // 기존 방식 (선형 비율)
+                                    // const list = rawData.map(item => {
+                                    //     let weight = (item.rentCount / maxCount) * 80;
+                                    //     if (weight < 12) weight = 12;
+                                    //     return [item.stationName, weight];
+                                    // });
+
+                                    if (mode === 'softmax') {
+                                        const logs = rawData.map(item => Math.log1p(item.rentCount));
+                                        const maxLog = Math.max(...logs);
+                                        const temperature = 0.45;
+                                        const exps = logs.map(v => Math.exp((v - maxLog) / temperature));
+                                        const expSum = exps.reduce((a, b) => a + b, 0);
+
+                                        return rawData.map((item, idx) => {
+                                            const p = exps[idx] / expSum;
+                                            const curved = Math.pow(p, 0.55) * 3.2;
+                                            const weight = minFont + (maxFont - minFont) * Math.min(1, curved);
+                                            return [item.stationName, weight];
+                                        });
+                                    }
+
+                                    if (mode === 'top-flat-tail-contrast') {
+                                        const gamma = 2.15;
+                                        return rawData.map(item => {
+                                            const ratio = maxCount === 0 ? 0 : item.rentCount / maxCount;
+                                            const curved = Math.pow(ratio, gamma);
+                                            const weight = minFont + (maxFont - minFont) * curved;
+                                            return [item.stationName, weight];
+                                        });
+                                    }
+
+                                    return rawData.map(item => {
+                                        const ratio = maxCount === 0 ? 0 : item.rentCount / maxCount;
+                                        const weight = minFont + (maxFont - minFont) * ratio;
+                                        return [item.stationName, weight];
+                                    });
+                                }
+
+                                function renderCanvasWordCloud(rawData, targetCanvas) {
+                                    const layer = document.getElementById('wordCloudGeoLayer');
+                                    if (layer) {
+                                        layer.remove();
+                                    }
+
+                                    targetCanvas.style.display = 'block';
+                                    const list = buildWordCloudList(rawData, WORDCLOUD_WEIGHT_MODE);
+                                    WordCloud(targetCanvas, {
+                                        list: list,
+                                        fontFamily: 'Inter, sans-serif',
+                                        color: function (word, weight) {
+                                            return (weight > 50) ? '#32C358' : '#94A3B8';
+                                        },
+                                        rotateRatio: 0,
+                                        backgroundColor: 'transparent'
+                                    });
+                                }
+
+                                renderCanvasWordCloud(data, canvas);
+                            }
+                        })
+                        .catch(err => console.error("WordCloud fetch failed:", err));
 
                 } catch (e) { console.error("Chart initialization failed", e); }
             }

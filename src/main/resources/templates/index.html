@@ -17,6 +17,8 @@
 
     <!-- Plotly -->
     <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <!-- WordCloud2.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.2.2/wordcloud2.min.js"></script>
 
     <!-- Tailwind CSS & Config -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -63,15 +65,18 @@
     <!-- Notification Toast -->
     <div id="notificationToast"
         class="fixed top-8 right-8 z-[100] transform translate-x-[120%] transition-transform duration-500 pointer-events-none">
-        <div class="bg-white border-l-4 border-bike-green shadow-[0_8px_30px_rgba(0,0,0,0.12)] rounded-xl p-5 flex items-center gap-4 min-w-[320px] border border-slate-100">
-            <div class="w-12 h-12 rounded-full bg-bike-light flex items-center justify-center text-bike-green shadow-sm">
+        <div
+            class="bg-white border-l-4 border-bike-green shadow-[0_8px_30px_rgba(0,0,0,0.12)] rounded-xl p-5 flex items-center gap-4 min-w-[320px] border border-slate-100">
+            <div
+                class="w-12 h-12 rounded-full bg-bike-light flex items-center justify-center text-bike-green shadow-sm">
                 <i class="fa-solid fa-bell-concierge text-lg"></i>
             </div>
             <div class="flex-1">
                 <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">System Notification</p>
                 <p id="toastMessage" class="text-sm text-slate-700 font-semibold leading-relaxed">알림 메시지 내용</p>
             </div>
-            <button onclick="hideToast()" class="text-slate-300 hover:text-slate-500 transition-colors p-1 pointer-events-auto">
+            <button onclick="hideToast()"
+                class="text-slate-300 hover:text-slate-500 transition-colors p-1 pointer-events-auto">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
@@ -110,7 +115,7 @@
             const toast = document.getElementById('notificationToast');
             const msgEl = document.getElementById('toastMessage');
             msgEl.innerText = message;
-            
+
             toast.classList.remove('translate-x-[120%]');
             toast.classList.add('translate-x-0');
 
