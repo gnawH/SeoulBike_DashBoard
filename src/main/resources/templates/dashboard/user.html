@@ -45,7 +45,7 @@
                     class="w-10 h-10 bg-bike-green rounded-xl flex items-center justify-center text-white shadow-[0_4px_12px_rgba(50,195,88,0.3)]">
                     <i class="fa-solid fa-bicycle text-lg"></i>
                 </div>
-                <span class="text-slate-900 font-bold text-xl tracking-tight">SeoulBike Analytics</span>
+                <span class="text-slate-900 font-bold text-xl tracking-tight" th:text="#{header.brand}">SeoulBike Analytics</span>
             </div>
 
             <!-- Right Utilities -->
@@ -56,19 +56,23 @@
                         class="flex items-center gap-2 px-4 h-10 bg-slate-50 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-slate-100 text-sm font-medium text-slate-700 hover:border-bike-green transition-colors"
                         onclick="document.getElementById('langDropdownMenu').classList.toggle('hidden')">
                         <i class="fa-solid fa-globe text-slate-400 transition-colors"></i>
-                        <span>KO / EN</span>
+                        <span th:text="${#locale.language == 'en' ? #messages.msg('header.lang.en.code') : #messages.msg('header.lang.ko.code')}">KO</span>
                         <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
                     </button>
                     <div id="langDropdownMenu"
                         class="hidden absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.08)] border border-slate-100 overflow-hidden z-50">
-                        <button type="button"
-                            class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 text-bike-green font-medium flex items-center justify-between">
-                            한국어 <i class="fa-solid fa-check text-[10px]"></i>
-                        </button>
-                        <button type="button"
-                            class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 text-slate-600 transition-colors">
-                            English
-                        </button>
+                        <a href="?lang=ko"
+                            th:classappend="${#locale.language != 'en'} ? 'text-bike-green font-bold' : 'text-slate-600'"
+                            class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 transition-colors flex items-center justify-between block">
+                            <span th:text="#{header.lang.ko}">한국어</span>
+                            <i th:if="${#locale.language != 'en'}" class="fa-solid fa-check text-[10px]"></i>
+                        </a>
+                        <a href="?lang=en"
+                            th:classappend="${#locale.language == 'en'} ? 'text-bike-green font-bold' : 'text-slate-600'"
+                            class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 transition-colors flex items-center justify-between block">
+                            <span th:text="#{header.lang.en}">English</span>
+                            <i th:if="${#locale.language == 'en'}" class="fa-solid fa-check text-[10px]"></i>
+                        </a>
                     </div>
                 </div>
                 <button
@@ -87,18 +91,18 @@
                     <div id="profileDropdownMenu"
                         class="hidden absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden z-50">
                         <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
-                            <p class="text-sm font-bold text-slate-800">김따릉</p>
-                            <p class="text-xs text-slate-500 font-medium">서울시 송파구</p>
+                            <p class="text-sm font-bold text-slate-800" th:text="#{header.profile.name}">김따릉</p>
+                            <p class="text-xs text-slate-500 font-medium" th:text="#{header.profile.region}">서울시 송파구</p>
                         </div>
                         <div class="py-1">
                             <a href="/updateUser"
                                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-bike-green transition-colors font-medium">
-                                <i class="fa-solid fa-user-pen w-4 text-center"></i>회원정보 수정
+                                <i class="fa-solid fa-user-pen w-4 text-center"></i><span th:text="#{header.profile.edit}">회원정보 수정</span>
                             </a>
                             <div class="h-px bg-slate-100 my-1"></div>
                             <a href="/logout"
                                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors font-medium">
-                                <i class="fa-solid fa-arrow-right-from-bracket w-4 text-center text-red-400"></i>로그아웃
+                                <i class="fa-solid fa-arrow-right-from-bracket w-4 text-center text-red-400"></i><span th:text="#{header.logout}">로그아웃</span>
                             </a>
                         </div>
                     </div>
@@ -120,12 +124,12 @@
                         </div>
                         <span
                             class="flex items-center text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
-                            <i class="fa-solid fa-tree mr-1"></i> 약 15만 그루
+                            <i class="fa-solid fa-tree mr-1"></i> <span th:text="#{kpi.carbon.badge}">약 15만 그루</span>
                         </span>
                     </div>
-                    <h3 class="text-slate-500 text-sm font-medium mb-1">2025년 총 탄소 절감량</h3>
+                    <h3 class="text-slate-500 text-sm font-medium mb-1" th:text="#{kpi.carbon.title}">2025년 총 탄소 절감량</h3>
                     <div class="text-2xl font-bold text-slate-900 group-hover:text-bike-green transition-colors">2,450.5
-                        <span class="text-lg font-normal text-slate-500">ton</span>
+                        <span class="text-lg font-normal text-slate-500" th:text="#{kpi.carbon.unit}">ton</span>
                     </div>
                 </div>
                 <!-- Card 2 -->
@@ -135,11 +139,11 @@
                         <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500">
                             <i class="fa-solid fa-route text-lg"></i>
                         </div>
-                        <span class="text-xs font-medium text-slate-400">지구 둘레 362바퀴</span>
+                        <span class="text-xs font-medium text-slate-400" th:text="#{kpi.distance.badge}">지구 둘레 362바퀴</span>
                     </div>
-                    <h3 class="text-slate-500 text-sm font-medium mb-1">총 누적 주행거리</h3>
+                    <h3 class="text-slate-500 text-sm font-medium mb-1" th:text="#{kpi.distance.title}">총 누적 주행거리</h3>
                     <div class="text-2xl font-bold text-slate-900 group-hover:text-blue-500 transition-colors">
-                        14,500,210 <span class="text-lg font-normal text-slate-500">km</span></div>
+                        14,500,210 <span class="text-lg font-normal text-slate-500" th:text="#{kpi.distance.unit}">km</span></div>
                 </div>
                 <!-- Card 3 -->
                 <div
@@ -150,11 +154,11 @@
                         </div>
                         <span
                             class="flex items-center text-xs font-medium text-orange-500 bg-orange-50 px-2 py-1 rounded-full">
-                            <i class="fa-solid fa-fire mr-1"></i> 1000회 대여
+                            <i class="fa-solid fa-fire mr-1"></i> <span th:text="#{kpi.hotplace.badge}">1000회 대여</span>
                         </span>
                     </div>
-                    <h3 class="text-slate-500 text-sm font-medium mb-1">1년 전 오늘의 최고 인기 대여소</h3>
-                    <div class="text-2xl font-bold text-slate-900 group-hover:text-orange-500 transition-colors">여의나루역
+                    <h3 class="text-slate-500 text-sm font-medium mb-1" th:text="#{kpi.hotplace.title}">1년 전 오늘의 최고 인기 대여소</h3>
+                    <div class="text-2xl font-bold text-slate-900 group-hover:text-orange-500 transition-colors" th:text="#{kpi.hotplace.value}">여의나루역
                         1번출구</div>
                 </div>
                 <!-- Card 4 -->
@@ -166,12 +170,12 @@
                         </div>
                         <span
                             class="flex items-center text-xs font-medium text-bike-green bg-bike-light px-2 py-1 rounded-full">
-                            <i class="fa-solid fa-arrow-trend-up mr-1"></i> 전년 대비 +15%
+                            <i class="fa-solid fa-arrow-trend-up mr-1"></i> <span th:text="#{kpi.time.badge}">전년 대비 +15%</span>
                         </span>
                     </div>
-                    <h3 class="text-slate-500 text-sm font-medium mb-1">2025년 누적 이용 시간</h3>
+                    <h3 class="text-slate-500 text-sm font-medium mb-1" th:text="#{kpi.time.title}">2025년 누적 이용 시간</h3>
                     <div class="text-2xl font-bold text-slate-900 group-hover:text-purple-500 transition-colors">452,000
-                        <span class="text-lg font-normal text-slate-500">시간</span>
+                        <span class="text-lg font-normal text-slate-500" th:text="#{kpi.time.unit}">시간</span>
                     </div>
                 </div>
             </section>
@@ -183,23 +187,23 @@
                     class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                     <div class="flex justify-between items-center mb-6">
                         <div>
-                            <h2 class="text-lg font-bold text-slate-900">기간별 따릉이 대여횟수</h2>
-                            <p class="text-sm text-slate-500">Rental Frequency by Period</p>
+                            <h2 class="text-lg font-bold text-slate-900" th:text="#{chart.usage.title}">기간별 따릉이 대여횟수</h2>
+                            <p class="text-sm text-slate-500" th:text="#{chart.usage.subtitle}">Rental Frequency by Period</p>
                         </div>
                         <div id="chartPeriodSelector"
                             class="flex gap-1 bg-slate-50 p-1 rounded-lg border border-slate-100">
                             <button
                                 class="px-3 py-1.5 text-xs font-medium bg-white text-slate-800 shadow-sm border border-slate-200 rounded-md transition-colors"
-                                onclick="updateUsageChart('daily', this)">일별</button>
+                                onclick="updateUsageChart('daily', this)" th:text="#{chart.usage.daily}">일별</button>
                             <button
                                 class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 border border-transparent rounded-md transition-colors"
-                                onclick="updateUsageChart('monthly', this)">월별</button>
+                                onclick="updateUsageChart('monthly', this)" th:text="#{chart.usage.monthly}">월별</button>
                             <button
                                 class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 border border-transparent rounded-md transition-colors hidden sm:block"
-                                onclick="updateUsageChart('quarterly', this)">분기별</button>
+                                onclick="updateUsageChart('quarterly', this)" th:text="#{chart.usage.quarterly}">분기별</button>
                             <button
                                 class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 border border-transparent rounded-md transition-colors hidden sm:block"
-                                onclick="updateUsageChart('half-yearly', this)">반기별</button>
+                                onclick="updateUsageChart('half-yearly', this)" th:text="#{chart.usage.halfyearly}">반기별</button>
                         </div>
                     </div>
                     <div id="usageTrendsChart" class="w-full h-[320px]"></div>
@@ -209,24 +213,24 @@
                 <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                     <div class="flex justify-between items-center mb-6">
                         <div>
-                            <h2 class="text-base font-bold text-slate-900">대여소 별 이용자 수</h2>
-                            <p class="text-xs text-slate-500 mt-0.5">User Count by Station</p>
+                            <h2 class="text-base font-bold text-slate-900" th:text="#{chart.stations.title}">대여소 별 이용자 수</h2>
+                            <p class="text-xs text-slate-500 mt-0.5" th:text="#{chart.stations.subtitle}">User Count by Station</p>
                         </div>
                         <select id="topStationsMonthFilter" onchange="updateTopStationsChart(this.value)"
                             class="pl-3 pr-8 py-1.5 bg-slate-50 text-slate-700 text-xs sm:text-sm font-medium rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-bike-green cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394A3B8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-no-repeat bg-[position:right_10px_center]">
-                            <option value="all">2025년 전체</option>
-                            <option value="1">1월</option>
-                            <option value="2">2월</option>
-                            <option value="3">3월</option>
-                            <option value="4">4월</option>
-                            <option value="5">5월</option>
-                            <option value="6">6월</option>
-                            <option value="7">7월</option>
-                            <option value="8">8월</option>
-                            <option value="9">9월</option>
-                            <option value="10">10월</option>
-                            <option value="11">11월</option>
-                            <option value="12">12월</option>
+                            <option value="all" th:text="#{chart.stations.all}">2025년 전체</option>
+                            <option value="1" th:text="#{chart.stations.month1}">1월</option>
+                            <option value="2" th:text="#{chart.stations.month2}">2월</option>
+                            <option value="3" th:text="#{chart.stations.month3}">3월</option>
+                            <option value="4" th:text="#{chart.stations.month4}">4월</option>
+                            <option value="5" th:text="#{chart.stations.month5}">5월</option>
+                            <option value="6" th:text="#{chart.stations.month6}">6월</option>
+                            <option value="7" th:text="#{chart.stations.month7}">7월</option>
+                            <option value="8" th:text="#{chart.stations.month8}">8월</option>
+                            <option value="9" th:text="#{chart.stations.month9}">9월</option>
+                            <option value="10" th:text="#{chart.stations.month10}">10월</option>
+                            <option value="11" th:text="#{chart.stations.month11}">11월</option>
+                            <option value="12" th:text="#{chart.stations.month12}">12월</option>
                         </select>
                     </div>
                     <div id="topStationsChart" class="w-full h-[320px]"></div>
@@ -239,8 +243,8 @@
                 <div
                     class="bg-white p-6 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col">
                     <div class="mb-6">
-                        <h2 class="text-base font-bold text-slate-900">이용자 성별 비율</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Gender Ratio of Users</p>
+                        <h2 class="text-base font-bold text-slate-900" th:text="#{demo.gender.title}">이용자 성별 비율</h2>
+                        <p class="text-xs text-slate-500 mt-0.5" th:text="#{demo.gender.subtitle}">Gender Ratio of Users</p>
                     </div>
                     <div class="flex-1 flex flex-col justify-center items-center gap-6">
                         <div class="flex items-end gap-8">
@@ -248,14 +252,14 @@
                                 <div class="text-4xl text-blue-500"><i class="fa-solid fa-person"></i></div>
                                 <div class="text-center">
                                     <div class="text-2xl font-bold text-slate-900">58%</div>
-                                    <div class="text-xs text-slate-500">Male</div>
+                                    <div class="text-xs text-slate-500" th:text="#{demo.gender.male}">Male</div>
                                 </div>
                             </div>
                             <div class="flex flex-col items-center gap-3">
                                 <div class="text-4xl text-pink-500"><i class="fa-solid fa-person-dress"></i></div>
                                 <div class="text-center">
                                     <div class="text-2xl font-bold text-slate-900">42%</div>
-                                    <div class="text-xs text-slate-500">Female</div>
+                                    <div class="text-xs text-slate-500" th:text="#{demo.gender.female}">Female</div>
                                 </div>
                             </div>
                         </div>
@@ -270,8 +274,8 @@
                 <div
                     class="bg-white p-6 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden flex flex-col">
                     <div class="mb-2 z-10 relative">
-                        <h2 class="text-base font-bold text-slate-900">지역별 이용분포</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Usage Distribution by Region</p>
+                        <h2 class="text-base font-bold text-slate-900" th:text="#{demo.region.title}">지역별 이용분포</h2>
+                        <p class="text-xs text-slate-500 mt-0.5" th:text="#{demo.region.subtitle}">Usage Distribution by Region</p>
                     </div>
                     <div class="flex-1 relative min-h-[200px] flex items-center justify-center">
                         <div class="relative w-full h-full">
@@ -299,8 +303,8 @@
                 <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                     <div class="flex justify-between items-center mb-2">
                         <div>
-                            <h2 class="text-base font-bold text-slate-900">계절별 이용분포</h2>
-                            <p class="text-xs text-slate-500 mt-0.5">Usage Distribution by Season</p>
+                            <h2 class="text-base font-bold text-slate-900" th:text="#{demo.season.title}">계절별 이용분포</h2>
+                            <p class="text-xs text-slate-500 mt-0.5" th:text="#{demo.season.subtitle}">Usage Distribution by Season</p>
                         </div>
                     </div>
                     <div id="seasonalChart" class="w-full h-[220px]"></div>
@@ -311,21 +315,21 @@
             <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                 <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h2 class="text-lg font-bold text-slate-900">실시간 따릉이 대여소별 거치율</h2>
+                        <h2 class="text-lg font-bold text-slate-900" th:text="#{map.title}">실시간 따릉이 대여소별 거치율</h2>
                         <div class="flex items-center gap-4 mt-1">
-                            <p class="text-sm text-slate-500">Real-time Station Occupancy Rate</p>
+                            <p class="text-sm text-slate-500" th:text="#{map.subtitle}">Real-time Station Occupancy Rate</p>
                             <div class="flex items-center gap-3 text-xs">
                                 <span class="flex items-center gap-1.5"><span
-                                        class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> 거치율 과다 (회수 필요)</span>
+                                        class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> <span th:text="#{map.excess.label}">거치율 과다 (회수 필요)</span></span>
                                 <span class="flex items-center gap-1.5"><span
-                                        class="w-2.5 h-2.5 rounded-full bg-red-500"></span> 거치율 부족 (보충 필요)</span>
+                                        class="w-2.5 h-2.5 rounded-full bg-red-500"></span> <span th:text="#{map.shortage.label}">거치율 부족 (보충 필요)</span></span>
                             </div>
                         </div>
                     </div>
-                    <button
+                    <a href="/api/bikes/download/csv"
                         class="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg text-sm transition-colors border border-slate-200">
-                        <i class="fa-solid fa-download"></i> Download CSV
-                    </button>
+                        <i class="fa-solid fa-download"></i> <span th:text="#{map.download}">Download CSV</span>
+                    </a>
                 </div>
 
                 <div class="flex flex-col lg:flex-row gap-6">
@@ -333,7 +337,7 @@
                         class="flex-1 h-[400px] rounded-xl overflow-hidden border border-slate-200 relative bg-slate-100 flex items-center justify-center z-0">
                         <div class="text-center z-0">
                             <p class="text-sm text-slate-500 font-medium mb-1">
-                                <i class="fa-solid fa-map-location-dot mr-1"></i> 지도를 불러오는 중입니다...
+                                <i class="fa-solid fa-map-location-dot mr-1"></i> <span th:text="#{map.loading.map}">지도를 불러오는 중입니다...</span>
                             </p>
                         </div>
                     </div>
@@ -341,21 +345,21 @@
                     <div class="w-full lg:w-[320px] flex flex-col gap-4">
                         <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
                             <h3 class="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
-                                <i class="fa-solid fa-battery-full"></i> 회수 필요 대여소 Top 4
+                                <i class="fa-solid fa-battery-full"></i> <span th:text="#{map.excess.top4}">회수 필요 대여소 Top 4</span>
                             </h3>
                             <div class="space-y-3" id="excessList">
                                 <div class="text-sm text-blue-600 font-medium flex items-center gap-2"><i
-                                        class="fa-solid fa-spinner fa-spin"></i> 로딩중...</div>
+                                        class="fa-solid fa-spinner fa-spin"></i> <span th:text="#{map.loading}">로딩중...</span></div>
                             </div>
                         </div>
 
                         <div class="bg-red-50 rounded-xl p-4 border border-red-100">
                             <h3 class="text-sm font-bold text-red-900 mb-3 flex items-center gap-2">
-                                <i class="fa-solid fa-battery-empty"></i> 보충 필요 대여소 Top 4
+                                <i class="fa-solid fa-battery-empty"></i> <span th:text="#{map.shortage.top4}">보충 필요 대여소 Top 4</span>
                             </h3>
                             <div class="space-y-3" id="shortageList">
                                 <div class="text-sm text-red-600 font-medium flex items-center gap-2"><i
-                                        class="fa-solid fa-spinner fa-spin"></i> 로딩중...</div>
+                                        class="fa-solid fa-spinner fa-spin"></i> <span th:text="#{map.loading}">로딩중...</span></div>
                             </div>
                         </div>
                     </div>
@@ -363,7 +367,20 @@
             </div>
         </main>
 
-        <script>
+        <script th:inline="javascript">
+            // 서버에서 전달받은 계절 라벨 (다국어)
+            var seasonLabels = [
+                [[#{demo.season.spring}]],
+                [[#{demo.season.summer}]],
+                [[#{demo.season.autumn}]],
+                [[#{demo.season.winter}]]
+            ];
+            // 다국어 텍스트 (지도 팝업 등에서 사용)
+            var i18n = {
+                occupancy: [[#{map.occupancy}]],
+                error: [[#{map.error}]]
+            };
+
             function initializeCharts() {
                 try {
                     // Usage Trends Chart
@@ -404,7 +421,7 @@
                     // Seasonal Distribution
                     const seasonalTrace = {
                         values: [40, 25, 20, 15],
-                        labels: ['봄', '여름', '가을', '겨울'],
+                        labels: seasonLabels,
                         type: 'pie', hole: 0.65,
                         marker: { colors: ['#F59E0B', '#10B981', '#EF4444', '#3B82F6'] },
                         textinfo: 'percent', textposition: 'inside', insidetextfont: { color: '#fff', size: 11 }, hoverinfo: 'label+percent'
@@ -469,36 +486,13 @@
                 Plotly.update('topStationsChart', { x: [nx], y: [ny] });
             }
 
-            // Language Dropdown
-            const langBtnToggle = document.getElementById('langToggleBtn');
-            const langMenuBox = document.getElementById('langDropdownMenu');
-
-            if (langBtnToggle && langMenuBox) {
-                const langOptions = langMenuBox.querySelectorAll('button');
-                langOptions.forEach(option => {
-                    option.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        const selectedLang = this.textContent.trim().replace('KO / EN', '').trim();
-                        const langSpan = langBtnToggle.querySelector('span');
-                        if (langSpan) { langSpan.textContent = selectedLang; }
-
-                        langOptions.forEach(opt => {
-                            opt.className = 'w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 text-slate-600 transition-colors flex items-center justify-between';
-                            opt.innerHTML = opt.textContent.trim();
-                        });
-
-                        this.className = 'w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 text-bike-green font-medium flex items-center justify-between';
-                        this.innerHTML = `${selectedLang} <i class="fa-solid fa-check text-[10px]"></i>`;
-                        langMenuBox.classList.add('hidden');
-                    });
-                });
-            }
-
-            // Profile Dropdown
-            const profileBtnToggle = document.getElementById('profileToggleBtn');
-            const profileMenuBox = document.getElementById('profileDropdownMenu');
-
+            // Dropdowns close on outside click
             document.addEventListener('click', function (e) {
+                const langBtnToggle = document.getElementById('langToggleBtn');
+                const langMenuBox = document.getElementById('langDropdownMenu');
+                const profileBtnToggle = document.getElementById('profileToggleBtn');
+                const profileMenuBox = document.getElementById('profileDropdownMenu');
+
                 if (langBtnToggle && langMenuBox && !langBtnToggle.contains(e.target) && !langMenuBox.contains(e.target)) {
                     langMenuBox.classList.add('hidden');
                 }
@@ -508,21 +502,26 @@
             });
 
             // Leaflet Map Initialization & Real-time Public Data Fetching
+            let leafletMap = null;
+
             async function initLeafletMap() {
                 try {
                     const mapContainer = document.getElementById('realtimeMap');
                     if (!mapContainer || typeof L === 'undefined') return;
 
-                    mapContainer.innerHTML = '';
+                    // 기존 지도가 있으면 제거 후 재생성 (Map container is already initialized 에러 방지)
+                    if (leafletMap !== null) {
+                        leafletMap.remove();
+                    }
 
-                    const map = L.map('realtimeMap').setView([37.5408, 126.9855], 11);
+                    leafletMap = L.map('realtimeMap').setView([37.5408, 126.9855], 11);
 
                     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                         maxZoom: 19,
                         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CartoDB</a>'
-                    }).addTo(map);
+                    }).addTo(leafletMap);
 
-                    const response = await fetch('http://openapi.seoul.go.kr:8088/736467435a7072693933696864776f/json/bikeList/1/1000/');
+                    const response = await fetch('/api/bikes/realtime');
                     const data = await response.json();
 
                     if (data.rentBikeStatus && data.rentBikeStatus.row) {
@@ -530,18 +529,16 @@
 
                         rows.forEach(r => {
                             r.sharedInt = parseInt(r.shared, 10);
-                            r.rackTotCntInt = parseInt(r.rackTotCnt, 10); // 전체 거치대 개수
-                            r.parkingBikeTotCntInt = parseInt(r.parkingBikeTotCnt, 10); // 현재 주차된 자전거 개수
+                            r.rackTotCntInt = parseInt(r.rackTotCnt, 10);
+                            r.parkingBikeTotCntInt = parseInt(r.parkingBikeTotCnt, 10);
                         });
 
-                        // 회수 필요 (거치율 높은 순 -> 거치대 개수 많은 순)
                         const sortedDesc = [...rows].sort((a, b) => {
                             if (b.sharedInt === a.sharedInt) return b.rackTotCntInt - a.rackTotCntInt;
                             return b.sharedInt - a.sharedInt;
                         });
                         const top4Excess = sortedDesc.slice(0, 4);
 
-                        // 보충 필요 (거치율 낮은 순 -> 거치대 개수 많은 순)
                         const sortedAsc = [...rows].sort((a, b) => {
                             if (a.sharedInt === b.sharedInt) return b.rackTotCntInt - a.rackTotCntInt;
                             return a.sharedInt - b.sharedInt;
@@ -578,8 +575,8 @@
                             });
 
                             L.marker([station.stationLatitude, station.stationLongitude], { icon: customIcon })
-                                .addTo(map)
-                                .bindPopup(`<div style="text-align:center;"><b>${cleanName}</b><br><span style="color:${markerColor}; font-weight:bold;">현재 거치율: ${station.shared}%</span></div>`);
+                                .addTo(leafletMap)
+                                .bindPopup(`<div style="text-align:center;"><b>${cleanName}</b><br><span style="color:${markerColor}; font-weight:bold;">${i18n.occupancy}: ${station.shared}%</span></div>`);
 
                             return `
                                 <div class="flex justify-between items-center text-sm py-0.5">
@@ -592,6 +589,10 @@
                             `;
                         };
 
+                        // 1. (Removed) Rendering all stations as small circles for cleaner view
+                        // Only the Top 4 stations for each category will be rendered below.
+
+                        // 2. Render Top 4 lists in Sidebar and Highlight them on Map with rich icons
                         if (excessListHtml) {
                             top4Excess.forEach((station, idx) => {
                                 excessListHtml.innerHTML += renderStation(station, 'excess', idx);
@@ -604,8 +605,10 @@
                             });
                         }
 
-                        if (top4Excess.length > 0) {
-                            map.flyTo([top4Excess[0].stationLatitude, top4Excess[0].stationLongitude], 13, { duration: 1.5 });
+                        const allTopMarkers = [...top4Excess, ...top4Shortage];
+                        if (allTopMarkers.length > 0) {
+                            const bounds = L.latLngBounds(allTopMarkers.map(s => [s.stationLatitude, s.stationLongitude]));
+                            leafletMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
                         }
                     }
 
@@ -613,12 +616,16 @@
                     console.error("Map fetch error:", e);
                     const excessListHtml = document.getElementById('excessList');
                     const shortageListHtml = document.getElementById('shortageList');
-                    if (excessListHtml) excessListHtml.innerHTML = '<span class="text-sm text-slate-500">데이터를 불러오지 못했습니다.</span>';
-                    if (shortageListHtml) shortageListHtml.innerHTML = '<span class="text-sm text-slate-500">데이터를 불러오지 못했습니다.</span>';
+                    if (excessListHtml) excessListHtml.innerHTML = '<span class="text-sm text-slate-500">' + i18n.error + '</span>';
+                    if (shortageListHtml) shortageListHtml.innerHTML = '<span class="text-sm text-slate-500">' + i18n.error + '</span>';
                 }
             }
 
-            window.addEventListener('load', () => setTimeout(initLeafletMap, 500));
+            window.addEventListener('load', () => {
+                setTimeout(initLeafletMap, 500);
+                // 5분마다 실시간 데이터 자동 갱신
+                setInterval(initLeafletMap, 300000);
+            });
         </script>
     </div>
 </body>

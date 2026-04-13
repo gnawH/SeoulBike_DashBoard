@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seoul Bike - Update Profile</title>
+    <title th:text="#{update.title}">Seoul Bike - Update Profile</title>
 
     <!-- FontAwesome & Fonts -->
     <script>window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };</script>
@@ -47,8 +47,34 @@
         <!-- Back Button -->
         <button type="button" onclick="history.back()"
             class="absolute top-8 left-8 text-slate-400 hover:text-bike-green transition-colors flex items-center gap-2 text-sm font-medium z-10 bg-white/80 px-2 py-1 rounded backdrop-blur focus:outline-none">
-            <i class="fa-solid fa-arrow-left"></i> 돌아가기
+            <i class="fa-solid fa-arrow-left"></i> <span th:text="#{update.back}">돌아가기</span>
         </button>
+
+        <!-- Language Selector -->
+        <div class="absolute top-8 right-8 relative z-10">
+            <button type="button" id="langToggleBtn"
+                class="flex items-center gap-2 px-4 h-10 bg-slate-50 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-slate-100 text-sm font-medium text-slate-700 hover:border-bike-green transition-colors"
+                onclick="document.getElementById('langDropdownMenu').classList.toggle('hidden')">
+                <i class="fa-solid fa-globe text-slate-400 transition-colors"></i>
+                <span th:text="${#locale.language == 'en' ? #messages.msg('header.lang.en.code') : #messages.msg('header.lang.ko.code')}">KO</span>
+                <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
+            </button>
+            <div id="langDropdownMenu"
+                class="hidden absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.08)] border border-slate-100 overflow-hidden z-50">
+                <a href="?lang=ko"
+                    th:classappend="${#locale.language != 'en'} ? 'text-bike-green font-bold' : 'text-slate-600'"
+                    class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 transition-colors flex items-center justify-between block">
+                    <span th:text="#{header.lang.ko}">한국어</span>
+                    <i th:if="${#locale.language != 'en'}" class="fa-solid fa-check text-[10px]"></i>
+                </a>
+                <a href="?lang=en"
+                    th:classappend="${#locale.language == 'en'} ? 'text-bike-green font-bold' : 'text-slate-600'"
+                    class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 transition-colors flex items-center justify-between block">
+                    <span th:text="#{header.lang.en}">English</span>
+                    <i th:if="${#locale.language == 'en'}" class="fa-solid fa-check text-[10px]"></i>
+                </a>
+            </div>
+        </div>
 
         <div class="w-full max-w-sm mt-12 mb-8">
             <div class="mb-10">
@@ -58,21 +84,20 @@
                         <i class="fa-solid fa-user-pen text-lg"></i>
                     </div>
                 </div>
-                <h2 class="text-3xl font-bold text-slate-900 mb-2 tracking-tight">회원정보 수정</h2>
-                <p class="text-sm text-slate-500 font-medium">계정 정보를 확인하고 수정할 수 있습니다.</p>
+                <h2 class="text-3xl font-bold text-slate-900 mb-2 tracking-tight" th:text="#{update.header}">회원정보 수정</h2>
+                <p class="text-sm text-slate-500 font-medium" th:text="#{update.desc}">계정 정보를 확인하고 수정할 수 있습니다.</p>
             </div>
 
             <form action="/auth/update" method="post" class="space-y-4">
-				<!-- 여기에 추가! -->
-				<input type="hidden" name="userId" th:value="${loginUser.userId}">
+                <input type="hidden" name="userId" th:value="${loginUser.userId}">
                 <div>
                     <label for="name" class="block text-sm font-bold text-slate-700 mb-1.5"><span
-                            class="text-red-500 mr-1">*</span>이름</label>
+                            class="text-red-500 mr-1">*</span><span th:text="#{update.name}">이름</span></label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fa-regular fa-user text-slate-300"></i>
                         </div>
-                        <input type="text" id="name" name="name" placeholder="홍길동"
+                        <input type="text" id="name" name="name" th:placeholder="#{update.name.placeholder}" placeholder="홍길동"
                             class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium"
                             required>
                     </div>
@@ -80,31 +105,30 @@
 
                 <div>
                     <label for="password" class="block text-sm font-bold text-slate-700 mb-1.5"><span
-                            class="text-red-500 mr-1">*</span>새로운 비밀번호</label>
+                            class="text-red-500 mr-1">*</span><span th:text="#{update.password.new}">새로운 비밀번호</span></label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fa-solid fa-lock text-slate-300"></i>
                         </div>
-                        <input type="password" id="password" name="password" placeholder="영문 대/소문자, 숫자, 특수문자 포함"
+                        <input type="password" id="password" name="password" th:placeholder="#{update.password.placeholder}" placeholder="영문 대/소문자, 숫자, 특수문자 포함"
                             pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+"
-                            title="비밀번호는 영문 대문자, 소문자, 숫자, 특수문자를 모두 포함해야 합니다."
                             class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium"
                             required>
                     </div>
                     <p id="password-hint" class="text-xs text-slate-500 mt-1.5 ml-1"><i
-                            class="fa-solid fa-circle-info mr-1"></i>영문 대/소문자, 숫자, 특수문자를 모두 포함해야 합니다.</p>
+                            class="fa-solid fa-circle-info mr-1"></i><span th:text="#{update.password.hint}">영문 대/소문자, 숫자, 특수문자를 모두 포함해야 합니다.</span></p>
                 </div>
 
                 <div>
                     <label for="password_confirm" class="block text-sm font-bold text-slate-700 mb-1.5"><span
-                            class="text-red-500 mr-1">*</span>비밀번호 확인</label>
+                            class="text-red-500 mr-1">*</span><span th:text="#{update.password.confirm}">비밀번호 확인</span></label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fa-solid fa-circle-check text-slate-300"></i>
                         </div>
                         <input type="password" id="password_confirm" name="password_confirm"
+                            th:placeholder="#{update.password.confirm.placeholder}"
                             placeholder="위 비밀번호와 동일하게 입력" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+"
-                            title="비밀번호는 영문 대문자, 소문자, 숫자, 특수문자를 모두 포함해야 합니다."
                             class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium"
                             required>
                     </div>
@@ -114,7 +138,7 @@
 
                 <div>
                     <label for="email" class="block text-sm font-bold text-slate-700 mb-1.5"><span
-                            class="text-red-500 mr-1">*</span>이메일</label>
+                            class="text-red-500 mr-1">*</span><span th:text="#{update.email}">이메일</span></label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fa-regular fa-envelope text-slate-300"></i>
@@ -127,14 +151,14 @@
 
                 <div>
                     <label for="region" class="block text-sm font-bold text-slate-700 mb-1.5"><span
-                            class="text-red-500 mr-1">*</span>관할 지역 (소속구)</label>
+                            class="text-red-500 mr-1">*</span><span th:text="#{update.region}">관할 지역 (소속구)</span></label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fa-solid fa-map-location-dot text-slate-300"></i>
                         </div>
                         <select id="region" name="region" required
                             class="block w-full pl-11 pr-8 py-3 bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-bike-green focus:border-transparent transition-all font-medium appearance-none cursor-pointer">
-                            <option value="" disabled selected>담당 지역을 선택하세요</option>
+                            <option value="" disabled selected th:text="#{update.region.placeholder}">담당 지역을 선택하세요</option>
                             <option value="강남구">강남구</option>
                             <option value="강동구">강동구</option>
                             <option value="강북구">강북구</option>
@@ -169,11 +193,13 @@
 
                 <div class="pt-6">
                     <button type="submit"
-                        class="w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-[0_4px_12px_rgba(50,195,88,0.3)] text-sm font-bold text-white bg-bike-green hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-100 transition-all transform hover:-translate-y-0.5">
+                        class="w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-[0_4px_12px_rgba(50,195,88,0.3)] text-sm font-bold text-white bg-bike-green hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-100 transition-all transform hover:-translate-y-0.5"
+                        th:text="#{update.submit}">
                         수정 완료
                     </button>
                     <button type="button" onclick="openDeleteModal()"
-                        class="w-full mt-3 flex justify-center items-center gap-2 py-3.5 px-4 border border-slate-200 rounded-xl text-sm font-bold text-slate-500 bg-white hover:bg-slate-50 hover:text-red-500 focus:outline-none transition-all">
+                        class="w-full mt-3 flex justify-center items-center gap-2 py-3.5 px-4 border border-slate-200 rounded-xl text-sm font-bold text-slate-500 bg-white hover:bg-slate-50 hover:text-red-500 focus:outline-none transition-all"
+                        th:text="#{update.withdraw}">
                         회원 탈퇴
                     </button>
                 </div>
@@ -193,23 +219,23 @@
                     <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center">
                         <i class="fa-solid fa-triangle-exclamation"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-slate-800">회원 탈퇴</h3>
+                    <h3 class="text-lg font-bold text-slate-800" th:text="#{withdraw.modal.title}">회원 탈퇴</h3>
                 </div>
 
                 <form action="/deleteUser" method="post">
                     <!-- Body -->
                     <div class="p-6">
-                        <p class="text-sm text-slate-600 mb-4 font-medium">안전한 탈퇴 처리를 위해 현재 비밀번호를 다시 한번 입력해 주세요. 탈퇴 시 모든
+                        <p class="text-sm text-slate-600 mb-4 font-medium" th:text="#{withdraw.modal.desc}">안전한 탈퇴 처리를 위해 현재 비밀번호를 다시 한번 입력해 주세요. 탈퇴 시 모든
                             데이터가 삭제되며 복구할 수 없습니다.</p>
 
                         <div>
                             <label for="delete_password" class="block text-sm font-bold text-slate-700 mb-1.5"><span
-                                    class="text-red-500 mr-1">*</span>비밀번호 확인</label>
+                                    class="text-red-500 mr-1">*</span><span th:text="#{withdraw.modal.password.label}">비밀번호 확인</span></label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     <i class="fa-solid fa-lock text-slate-300"></i>
                                 </div>
-                                <input type="password" id="delete_password" name="password" placeholder="현재 비밀번호 입력"
+                                <input type="password" id="delete_password" name="password" th:placeholder="#{withdraw.modal.password.placeholder}" placeholder="현재 비밀번호 입력"
                                     class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all font-medium"
                                     required>
                             </div>
@@ -219,11 +245,13 @@
                     <!-- Footer -->
                     <div class="bg-slate-50 px-6 py-4 flex justify-end gap-3 rounded-b-2xl">
                         <button type="button" onclick="closeDeleteModal()"
-                            class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-200 bg-slate-100 rounded-lg transition-colors focus:outline-none">
+                            class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-200 bg-slate-100 rounded-lg transition-colors focus:outline-none"
+                            th:text="#{withdraw.modal.cancel}">
                             취소
                         </button>
                         <button type="submit"
-                            class="px-5 py-2.5 text-sm font-bold text-white bg-red-500 hover:bg-red-600 rounded-lg shadow-[0_4px_12px_rgba(239,68,68,0.3)] transition-colors focus:outline-none focus:ring-4 focus:ring-red-100">
+                            class="px-5 py-2.5 text-sm font-bold text-white bg-red-500 hover:bg-red-600 rounded-lg shadow-[0_4px_12px_rgba(239,68,68,0.3)] transition-colors focus:outline-none focus:ring-4 focus:ring-red-100"
+                            th:text="#{withdraw.modal.submit}">
                             탈퇴하기
                         </button>
                     </div>
@@ -242,8 +270,8 @@
         </div>
 
         <div class="relative z-10 p-12 text-left text-white max-w-lg mt-auto mb-16">
-            <h1 class="text-4xl font-bold mb-4 tracking-tight leading-tight">정확한 정보 관리는<br>신뢰받는 행정의 기본입니다.</h1>
-            <p class="text-lg text-slate-200 leading-relaxed font-medium mb-8">
+            <h1 class="text-4xl font-bold mb-4 tracking-tight leading-tight" th:utext="#{update.brand.desc}">정확한 정보 관리는<br>신뢰받는 행정의 기본입니다.</h1>
+            <p class="text-lg text-slate-200 leading-relaxed font-medium mb-8" th:utext="#{update.brand.subdesc}">
                 계정 정보를 안전하게 최신화하여 원활하게 대시보드를 관리하세요.<br>
                 주기적인 비밀번호 변경은 보안을 강력하게 유지합니다.
             </p>
@@ -251,13 +279,21 @@
     </div>
 
     <!-- UI Validation Script -->
-    <script>
+    <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function () {
             const passwordInput = document.getElementById('password');
             const passwordHint = document.getElementById('password-hint');
 
             const passwordConfirmInput = document.getElementById('password_confirm');
             const passwordConfirmHint = document.getElementById('password-confirm-hint');
+
+            // 다국어 메시지 로드
+            const msgs = {
+                valid: [[#{update.password.valid}]],
+                hint: [[#{update.password.hint}]],
+                match: [[#{update.password.match}]],
+                mismatch: [[#{update.password.mismatch}]]
+            };
 
             function updateHintStyle(isValid, hintElement, inputElement, defaultText) {
                 if (inputElement.value.length === 0) {
@@ -269,7 +305,7 @@
 
                 if (isValid) {
                     hintElement.className = "text-xs text-bike-green mt-1.5 ml-1";
-                    hintElement.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>조건을 만족합니다.';
+                    hintElement.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i>${msgs.valid}`;
                     inputElement.classList.remove('border-red-500', 'ring-red-500');
                     inputElement.classList.add('border-bike-green', 'ring-bike-green');
                 } else {
@@ -283,7 +319,7 @@
             if (passwordInput) {
                 passwordInput.addEventListener('blur', function () {
                     const isValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/.test(this.value);
-                    updateHintStyle(isValid, passwordHint, this, '영문 대/소문자, 숫자, 특수문자를 모두 포함해야 합니다.');
+                    updateHintStyle(isValid, passwordHint, this, msgs.hint);
                     if (passwordConfirmInput.value.length > 0) checkPasswordMatch();
                 });
             }
@@ -297,12 +333,12 @@
                 passwordConfirmHint.classList.remove('hidden');
                 if (passwordInput.value === passwordConfirmInput.value) {
                     passwordConfirmHint.className = "text-xs text-bike-green mt-1.5 ml-1";
-                    passwordConfirmHint.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>비밀번호가 일치합니다.';
+                    passwordConfirmHint.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i>${msgs.match}`;
                     passwordConfirmInput.classList.remove('border-red-500', 'ring-red-500');
                     passwordConfirmInput.classList.add('border-bike-green', 'ring-bike-green');
                 } else {
                     passwordConfirmHint.className = "text-xs text-red-500 mt-1.5 ml-1";
-                    passwordConfirmHint.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i>비밀번호가 서로 일치하지 않습니다.';
+                    passwordConfirmHint.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i>${msgs.mismatch}`;
                     passwordConfirmInput.classList.remove('border-bike-green', 'ring-bike-green');
                     passwordConfirmInput.classList.add('border-red-500', 'ring-red-500');
                 }
@@ -319,7 +355,6 @@
                 const panel = document.getElementById('deleteModalPanel');
 
                 modal.classList.remove('hidden');
-                // Allow browser to render display:block before transitioning opacity
                 setTimeout(() => {
                     backdrop.classList.remove('opacity-0');
                     panel.classList.remove('opacity-0', 'scale-95');
@@ -338,8 +373,17 @@
 
                 setTimeout(() => {
                     modal.classList.add('hidden');
-                }, 300); // Matches Tailwind transition duration (300ms)
+                }, 300);
             };
+
+            // Close language dropdown when clicking outside
+            document.addEventListener('click', function (e) {
+                const langBtnToggle = document.getElementById('langToggleBtn');
+                const langMenuBox = document.getElementById('langDropdownMenu');
+                if (langBtnToggle && langMenuBox && !langBtnToggle.contains(e.target) && !langMenuBox.contains(e.target)) {
+                    langMenuBox.classList.add('hidden');
+                }
+            });
         });
     </script>
 </body>
