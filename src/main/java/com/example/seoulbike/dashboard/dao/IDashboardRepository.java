@@ -12,6 +12,7 @@ import com.example.seoulbike.dashboard.model.DashboardSeasonUsage;
 import com.example.seoulbike.dashboard.model.DashboardStationOccupancy;
 import com.example.seoulbike.dashboard.model.DashboardStationUsage;
 import com.example.seoulbike.dashboard.model.DashboardTrendPoint;
+import com.example.seoulbike.dashboard.model.DashboardWordCloudItem;
 
 /**
  * IDashboardRepository
@@ -26,8 +27,11 @@ import com.example.seoulbike.dashboard.model.DashboardTrendPoint;
 @Mapper
 public interface IDashboardRepository {
 
-    /** 상단 KPI 리본 데이터 조회 */
+    /** 상단 KPI 조회 / 1년 전 오늘의 최고 인기 대여소 제외 */
     DashboardKpi selectDashboardKpi(DashboardQueryFilter filter);
+    
+    /** 1년 전 오늘의 최고 인기 대여소 조회 */
+    DashboardKpi bestRentalOffice(DashboardQueryFilter filter);
 
     /** 기간별 대여 횟수 추이 조회 */
     List<DashboardTrendPoint> selectUsageTrend(DashboardQueryFilter filter);
@@ -36,7 +40,7 @@ public interface IDashboardRepository {
     List<DashboardStationUsage> selectTopStationsByUsers(DashboardQueryFilter filter);
 
     /** 성별 이용 비율 조회 */
-    DashboardGenderRatio selectGenderRatio(DashboardQueryFilter filter);
+    List<DashboardGenderRatio> selectGenderRatio(DashboardQueryFilter filter);
 
     /** 지역별 이용 분포 조회 */
     List<DashboardRegionUsage> selectRegionUsageDistribution(DashboardQueryFilter filter);
@@ -64,4 +68,10 @@ public interface IDashboardRepository {
 
     /** 보충 필요 대여소 Top N 조회(거치율 부족) */
     List<DashboardStationOccupancy> selectUnderOccupiedStations(DashboardQueryFilter filter);
+
+    /** 담당구 기준 워드클라우드 데이터 조회 */
+    List<DashboardWordCloudItem> selectWordCloudByRegion(DashboardQueryFilter filter);
+
+    /** 특정 지역구의 대여소 마스터 정보 조회 (API 실시간 데이터 조인용) */
+    List<DashboardStationOccupancy> selectRentalOfficesByRegion(String region);
 }

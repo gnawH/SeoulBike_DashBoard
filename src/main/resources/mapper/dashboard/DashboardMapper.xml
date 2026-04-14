@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "../mybatis-3-mapper.dtd">
 
@@ -35,8 +35,8 @@
     </resultMap>
 
     <resultMap id="genderRatioResultMap" type="com.example.seoulbike.dashboard.model.DashboardGenderRatio">
-        <result property="malePercent" column="MALE_PERCENT" />
-        <result property="femalePercent" column="FEMALE_PERCENT" />
+        <result property="gender" column="GENDER"/>
+    	<result property="percent" column="PERCENT"/>
     </resultMap>
 
     <resultMap id="regionUsageResultMap" type="com.example.seoulbike.dashboard.model.DashboardRegionUsage">
@@ -62,30 +62,43 @@
         <result property="occupancyStatus" column="OCCUPANCY_STATUS" />
     </resultMap>
 
-    <!-- 상단 KPI 조회 -->
+    <!-- 상단 KPI 조회 / 1년 전 오늘의 최고 인기 대여소 제외 -->
     <select id="selectDashboardKpi"
             parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
             resultMap="dashboardKpiResultMap">
         SELECT
-            2450.5 AS CARBON_REDUCTION_TON,
-            150000 AS TREE_EQUIVALENT_COUNT,
-            14500210 AS TOTAL_DISTANCE_KM,
-            362 AS EARTH_ROUNDS_EQUIVALENT,
-            '여의나루역 1번출구' AS TOP_STATION_NAME,
-            1000 AS TOP_STATION_RENT_COUNT,
-            452000 AS TOTAL_USAGE_HOURS,
-            15 AS YOY_GROWTH_RATE
-        FROM DUAL
+           	ROUND(SUM(CARBON_AMOUNT), 0) AS CARBON_REDUCTION_TON,
+            ROUND((SUM(CARBON_AMOUNT) * 1000) / 6.6, -6) / 10000000 AS TREE_EQUIVALENT_COUNT,
+            ROUND(ROUND(SUM(DISTANCE)/1000), 0) AS TOTAL_DISTANCE_KM,
+            ROUND(SUM(DISTANCE) / 40075, 0) AS EARTH_ROUNDS_EQUIVALENT,
+            ROUND(SUM(USAGE_MINUTE) / 60, 0) AS TOTAL_USAGE_HOURS
+        FROM SEOUL_BIKE
+    </select>
+    
+    <!-- 1년 전 오늘의 최고 인기 대여소 -->
+    <select id="bestRentalOffice"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultMap="dashboardKpiResultMap">
+        SELECT 
+            TRIM(SUBSTR(RENTAL_OFFICE_NAME, INSTR(RENTAL_OFFICE_NAME, '.') + 1)) AS TOP_STATION_NAME, 
+            SUM(NUM_OF_USES) AS TOP_STATION_RENT_COUNT
+        FROM SEOUL_BIKE
+        WHERE RENTAL_DATE = TRUNC(ADD_MONTHS(SYSDATE, -12))
+        GROUP BY RENTAL_OFFICE_NAME
+        ORDER BY TOP_STATION_RENT_COUNT DESC
+        FETCH FIRST 1 ROWS ONLY
     </select>
 
-    <!-- 기간별 대여 횟수 조회 -->
+    <!-- 기간별 대여 횟수 조회 (클라이언트 사이드 합산을 위해 일별로 고정) -->
     <select id="selectUsageTrend"
             parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
             resultMap="usageTrendResultMap">
-        SELECT PERIOD_LABEL, RENT_COUNT
-        FROM DASHBOARD_USAGE_TREND
-        WHERE YEAR_VAL = #{year}
-        ORDER BY PERIOD_ORDER
+        SELECT 
+            TO_CHAR(RENTAL_DATE, 'MM-DD') AS PERIOD_LABEL,
+            SUM(NUM_OF_USES) AS RENT_COUNT
+        FROM SEOUL_BIKE
+        GROUP BY TO_CHAR(RENTAL_DATE, 'MM-DD')
+        ORDER BY PERIOD_LABEL
     </select>
 
     <!-- 대여소별 이용자 수 Top N -->
@@ -110,14 +123,29 @@
     <select id="selectGenderRatio"
             parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
             resultMap="genderRatioResultMap">
-        SELECT
-            MALE_PERCENT,
-            FEMALE_PERCENT
-        FROM DASHBOARD_GENDER_RATIO
-        WHERE YEAR_VAL = #{year}
+        SELECT 
+		    UPPER(GENDER) AS GENDER,
+		    ROUND(COUNT(*) / (SELECT COUNT(*) FROM SEOUL_BIKE WHERE GENDER IS NOT NULL) * 100, 1) AS PERCENT
+		FROM SEOUL_BIKE
+		WHERE GENDER IS NOT NULL
+		GROUP BY UPPER(GENDER)
     </select>
 
     <!-- 지역별 이용 분포 -->
+    <select id="selectWordCloudByRegion"
+            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
+            resultType="com.example.seoulbike.dashboard.model.DashboardWordCloudItem">
+        SELECT
+            R.REGION AS stationName,
+            SUM(S.NUM_OF_USES) AS rentCount
+        FROM SEOUL_BIKE S
+        JOIN RENTAL_OFFICE_INFO R ON S.RENTAL_OFFICE_NO = R.RENTAL_OFFICE_NO
+        WHERE S.RENTAL_DATE = ADD_MONTHS(TRUNC(SYSDATE), -12)
+        GROUP BY R.REGION
+        ORDER BY rentCount DESC
+    </select>
+
+    <!-- 지역별 이용 분포
     <select id="selectRegionUsageDistribution"
             parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
             resultMap="regionUsageResultMap">
@@ -132,43 +160,35 @@
             WHERE YEAR_VAL = #{year}
         )
         ORDER BY RANK_NO
-    </select>
+    </select> -->
 
     <!-- 계절별 이용 분포 -->
     <select id="selectSeasonUsageDistribution"
             parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
             resultMap="seasonUsageResultMap">
-        SELECT
-            SEASON_NAME,
-            USAGE_COUNT,
-            USAGE_PERCENT
-        FROM DASHBOARD_SEASON_USAGE
-        WHERE YEAR_VAL = #{year}
-        ORDER BY SEASON_ORDER
-    </select>
-
-    <!-- 실시간 거치율 지도 데이터 -->
-    <select id="selectRealtimeStationOccupancy"
-            parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
-            resultMap="stationOccupancyResultMap">
-        SELECT
-            O.STATION_ID,
-            O.STATION_NAME,
-            M.REGION_NAME,
-            O.LATITUDE,
-            O.LONGITUDE,
-            O.OCCUPANCY_RATE,
-            CASE
-                WHEN O.OCCUPANCY_RATE > NVL(#{occupancyThreshold}, 100) THEN 'OVER'
-                ELSE 'UNDER'
-            END AS OCCUPANCY_STATUS
-        FROM DASHBOARD_STATION_OCCUPANCY O
-        JOIN STATION_REGION_MAP M
-          ON O.STATION_ID = M.STATION_ID
-        WHERE O.LAST_UPDATED_AT = (
-            SELECT MAX(LAST_UPDATED_AT) FROM DASHBOARD_STATION_OCCUPANCY
-        )
-                    AND (#{regionName} IS NULL OR M.REGION_NAME = #{regionName})
+        SELECT 
+		    SEASON AS SEASON_NAME, 
+		    SUM(NUM_OF_USES) AS USAGE_COUNT,
+		    ROUND(RATIO_TO_REPORT(SUM(NUM_OF_USES)) OVER () * 100, 1) AS USAGE_PERCENT
+		FROM (
+		    SELECT 
+		        NUM_OF_USES,
+		        CASE 
+		            WHEN TO_CHAR(RENTAL_DATE, 'MM') IN ('03', '04', '05') THEN '봄'
+		            WHEN TO_CHAR(RENTAL_DATE, 'MM') IN ('06', '07', '08') THEN '여름'
+		            WHEN TO_CHAR(RENTAL_DATE, 'MM') IN ('09', '10', '11') THEN '가을'
+		            ELSE '겨울'
+		        END AS SEASON
+		    FROM SEOUL_BIKE
+		)
+		GROUP BY SEASON
+		ORDER BY 
+		    CASE SEASON
+		        WHEN '봄' THEN 1
+		        WHEN '여름' THEN 2
+		        WHEN '가을' THEN 3
+		        ELSE 4
+		    END
     </select>
 
     <!-- 로그인 사용자의 구 기준 거치율 상위 N개 -->
@@ -327,6 +347,22 @@
             ORDER BY O.OCCUPANCY_RATE ASC
         )
         WHERE ROWNUM <![CDATA[ <= ]]> NVL(#{limit}, 4)
+    </select>
+
+    <!-- 특정 지역구의 대여소 마스터 정보 조회 (API 실시간 데이터 조인용) -->
+    <select id="selectRentalOfficesByRegion"
+            parameterType="String"
+            resultMap="stationOccupancyResultMap">
+        SELECT
+            RENTAL_OFFICE_ID AS STATION_ID,
+            RENTAL_OFFICE_NAME AS STATION_NAME,
+            REGION AS REGION_NAME,
+            LATITUDE,
+            LONGITUDE,
+            0 AS OCCUPANCY_RATE,
+            'NORMAL' AS OCCUPANCY_STATUS
+        FROM RENTAL_OFFICE_INFO
+        WHERE REGION = #{region}
     </select>
 
 </mapper>
