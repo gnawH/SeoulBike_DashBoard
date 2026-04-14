@@ -46,14 +46,12 @@ public class DashboardRealtimeMapService {
                 .collect(Collectors.toMap(DashboardStationOccupancy::getStationId, Function.identity()));
     }
 
-    // 2. 실시간 조인 및 핵심 로직
-    public DashboardRealtimeMapResponse getRealtimeMapData(String region) {
+    public List<DashboardStationOccupancy> getAllStationsOccupancy(String region) {
         // DB에서 지역구 대여소 목록 가져오기
         Map<String, DashboardStationOccupancy> stationMap = getStationsByRegionFromDb(region);
         
         if (stationMap.isEmpty()) {
-            log.warn("[RealtimeMap] {} 지역구에 등록된 대여소가 없습니다.", region);
-            return new DashboardRealtimeMapResponse(37.5665, 126.9780, new ArrayList<>(), new ArrayList<>());
+            return new ArrayList<>();
         }
 
         // OpenAPI 파트 - 3개의 페이지를 비동기 호출 (1~1000, 1001~2000, 2001~3000)
@@ -69,7 +67,7 @@ public class DashboardRealtimeMapService {
             allRows.addAll(page3.get());
         } catch (Exception e) {
             log.error("[RealtimeMap] API 호출 실패", e);
-            return new DashboardRealtimeMapResponse(37.5665, 126.9780, new ArrayList<>(), new ArrayList<>()); // 방어: 빈 객체 반환 시청 중심
+            return new ArrayList<>();
         }
 
         // 3. 병합 (Join) - 메모리 내 교집합
@@ -90,9 +88,19 @@ public class DashboardRealtimeMapService {
                 }
             }
         }
+        return new ArrayList<>(stationMap.values());
+    }
+
+    // 2. 실시간 조인 및 핵심 로직
+    public DashboardRealtimeMapResponse getRealtimeMapData(String region) {
+        List<DashboardStationOccupancy> sortedList = getAllStationsOccupancy(region);
+        
+        if (sortedList.isEmpty()) {
+            log.warn("[RealtimeMap] {} 지역구에 등록된 대여소가 없습니다.", region);
+            return new DashboardRealtimeMapResponse(37.5665, 126.9780, new ArrayList<>(), new ArrayList<>());
+        }
 
         // 4. 정렬 (거치율 최상위/최하위) - 타이브레이커: stationId
-        List<DashboardStationOccupancy> sortedList = new ArrayList<>(stationMap.values());
         sortedList.sort(Comparator.comparingDouble(DashboardStationOccupancy::getOccupancyRate)
                 .thenComparing(DashboardStationOccupancy::getStationId));
         
