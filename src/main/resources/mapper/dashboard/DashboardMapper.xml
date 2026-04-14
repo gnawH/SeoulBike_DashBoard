@@ -35,8 +35,8 @@
     </resultMap>
 
     <resultMap id="genderRatioResultMap" type="com.example.seoulbike.dashboard.model.DashboardGenderRatio">
-        <result property="malePercent" column="MALE_PERCENT" />
-        <result property="femalePercent" column="FEMALE_PERCENT" />
+        <result property="gender" column="GENDER"/>
+    	<result property="percent" column="PERCENT"/>
     </resultMap>
 
     <resultMap id="regionUsageResultMap" type="com.example.seoulbike.dashboard.model.DashboardRegionUsage">
@@ -121,11 +121,12 @@
     <select id="selectGenderRatio"
             parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
             resultMap="genderRatioResultMap">
-        SELECT
-            MALE_PERCENT,
-            FEMALE_PERCENT
-        FROM DASHBOARD_GENDER_RATIO
-        WHERE YEAR_VAL = #{year}
+        SELECT 
+		    UPPER(GENDER) AS GENDER,
+		    ROUND(COUNT(*) / (SELECT COUNT(*) FROM SEOUL_BIKE WHERE GENDER IS NOT NULL) * 100, 1) AS PERCENT
+		FROM SEOUL_BIKE
+		WHERE GENDER IS NOT NULL
+		GROUP BY UPPER(GENDER)
     </select>
 
     <!-- 지역별 이용 분포 -->
@@ -163,13 +164,29 @@
     <select id="selectSeasonUsageDistribution"
             parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
             resultMap="seasonUsageResultMap">
-        SELECT
-            SEASON_NAME,
-            USAGE_COUNT,
-            USAGE_PERCENT
-        FROM DASHBOARD_SEASON_USAGE
-        WHERE YEAR_VAL = #{year}
-        ORDER BY SEASON_ORDER
+        SELECT 
+		    SEASON AS SEASON_NAME, 
+		    SUM(NUM_OF_USES) AS USAGE_COUNT,
+		    ROUND(RATIO_TO_REPORT(SUM(NUM_OF_USES)) OVER () * 100, 1) AS USAGE_PERCENT
+		FROM (
+		    SELECT 
+		        NUM_OF_USES,
+		        CASE 
+		            WHEN TO_CHAR(RENTAL_DATE, 'MM') IN ('03', '04', '05') THEN '봄'
+		            WHEN TO_CHAR(RENTAL_DATE, 'MM') IN ('06', '07', '08') THEN '여름'
+		            WHEN TO_CHAR(RENTAL_DATE, 'MM') IN ('09', '10', '11') THEN '가을'
+		            ELSE '겨울'
+		        END AS SEASON
+		    FROM SEOUL_BIKE
+		)
+		GROUP BY SEASON
+		ORDER BY 
+		    CASE SEASON
+		        WHEN '봄' THEN 1
+		        WHEN '여름' THEN 2
+		        WHEN '가을' THEN 3
+		        ELSE 4
+		    END
     </select>
 
     <!-- 로그인 사용자의 구 기준 거치율 상위 N개 -->

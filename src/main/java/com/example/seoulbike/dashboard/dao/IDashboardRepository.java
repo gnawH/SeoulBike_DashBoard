@@ -40,7 +40,7 @@ public interface IDashboardRepository {
     List<DashboardStationUsage> selectTopStationsByUsers(DashboardQueryFilter filter);
 
     /** 성별 이용 비율 조회 */
-    DashboardGenderRatio selectGenderRatio(DashboardQueryFilter filter);
+    List<DashboardGenderRatio> selectGenderRatio(DashboardQueryFilter filter);
 
     /** 지역별 이용 분포 조회 */
     List<DashboardRegionUsage> selectRegionUsageDistribution(DashboardQueryFilter filter);

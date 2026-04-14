@@ -290,21 +290,24 @@
                             <div class="flex flex-col items-center gap-3">
                                 <div class="text-4xl text-blue-500"><i class="fa-solid fa-person"></i></div>
                                 <div class="text-center">
-                                    <div class="text-2xl font-bold text-slate-900">58%</div>
+                                    <div class="text-2xl font-bold text-slate-900"
+                                        th:text="|${#numbers.formatDecimal(genderRatio['M'], 1, 1)}%|">58.0%</div>
                                     <div class="text-xs text-slate-500" th:text="#{demo.gender.male}">Male</div>
                                 </div>
                             </div>
                             <div class="flex flex-col items-center gap-3">
                                 <div class="text-4xl text-pink-500"><i class="fa-solid fa-person-dress"></i></div>
                                 <div class="text-center">
-                                    <div class="text-2xl font-bold text-slate-900">42%</div>
+                                    <div class="text-2xl font-bold text-slate-900"
+                                        th:text="|${#numbers.formatDecimal(genderRatio['F'], 1, 1)}%|">42.0%
+                                    </div>
                                     <div class="text-xs text-slate-500" th:text="#{demo.gender.female}">Female</div>
                                 </div>
                             </div>
                         </div>
                         <div class="w-full flex h-2 rounded-full overflow-hidden mt-2">
-                            <div class="bg-blue-500 w-[58%]"></div>
-                            <div class="bg-pink-500 w-[42%]"></div>
+                            <div class="bg-blue-500" th:style="|width: ${genderRatio['M']}%|"></div>
+                            <div class="bg-pink-500" th:style="|width: ${genderRatio['F']}%|"></div>
                         </div>
                     </div>
                 </div>
@@ -453,10 +456,25 @@
                     Plotly.newPlot('topStationsChart', [topStationsTrace], topStationsLayout, { responsive: true, displayModeBar: false });
 
                     // Seasonal Distribution
+                    const rawSeasonUsage = /*[[${seasonUsage}]]*/[];
+                    const seasonMap = {};
+                    if (rawSeasonUsage) {
+                        rawSeasonUsage.forEach(item => {
+                            seasonMap[item.seasonName] = item.usagePercent;
+                        });
+                    }
+
+                    const seasonalValues = [
+                        seasonMap['봄'] || 0,
+                        seasonMap['여름'] || 0,
+                        seasonMap['가을'] || 0,
+                        seasonMap['겨울'] || 0
+                    ];
                     const seasonalTrace = {
-                        values: [40, 25, 20, 15],
+                        values: seasonalValues,
                         labels: seasonLabels,
                         type: 'pie', hole: 0.65,
+                        sort: false,
                         marker: { colors: ['#F59E0B', '#10B981', '#EF4444', '#3B82F6'] },
                         textinfo: 'percent', textposition: 'inside', insidetextfont: { color: '#fff', size: 11 }, hoverinfo: 'label+percent'
                     };
