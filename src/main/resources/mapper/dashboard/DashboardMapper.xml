@@ -89,14 +89,16 @@
         FETCH FIRST 1 ROWS ONLY
     </select>
 
-    <!-- 기간별 대여 횟수 조회 -->
+    <!-- 기간별 대여 횟수 조회 (클라이언트 사이드 합산을 위해 일별로 고정) -->
     <select id="selectUsageTrend"
             parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
             resultMap="usageTrendResultMap">
-        SELECT PERIOD_LABEL, RENT_COUNT
-        FROM DASHBOARD_USAGE_TREND
-        WHERE YEAR_VAL = #{year}
-        ORDER BY PERIOD_ORDER
+        SELECT 
+            TO_CHAR(RENTAL_DATE, 'MM-DD') AS PERIOD_LABEL,
+            SUM(NUM_OF_USES) AS RENT_COUNT
+        FROM SEOUL_BIKE
+        GROUP BY TO_CHAR(RENTAL_DATE, 'MM-DD')
+        ORDER BY PERIOD_LABEL
     </select>
 
     <!-- 대여소별 이용자 수 Top N -->

@@ -4,11 +4,14 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.seoulbike.auth.model.AuthResponse;
+import com.example.seoulbike.dashboard.model.DashboardTrendPoint;
 import com.example.seoulbike.dashboard.model.DashboardWordCloudItem;
 import com.example.seoulbike.dashboard.service.DashboardWordCloudService;
+import com.example.seoulbike.service.IDashboardService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -16,13 +19,15 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/api/dashboard")
 public class DashboardApiController {
 
+    private final IDashboardService dashboardService;
     private final DashboardWordCloudService wordCloudService;
     private final com.example.seoulbike.dashboard.service.DashboardRealtimeMapService realtimeMapService;
 
-    public DashboardApiController(DashboardWordCloudService wordCloudService,
+    public DashboardApiController(DashboardWordCloudService wordCloudService, IDashboardService dashboardService,
                                   com.example.seoulbike.dashboard.service.DashboardRealtimeMapService realtimeMapService) {
         this.wordCloudService = wordCloudService;
         this.realtimeMapService = realtimeMapService;
+        this.dashboardService = dashboardService;
     }
 
     @GetMapping("/wordcloud")
@@ -41,5 +46,10 @@ public class DashboardApiController {
             return new com.example.seoulbike.dashboard.model.DashboardRealtimeMapResponse();
         }
         return realtimeMapService.getRealtimeMapData(region);
+    }
+
+    @GetMapping("/trend")
+    public List<DashboardTrendPoint> getTrend(@RequestParam("periodType") String periodType) {
+        return dashboardService.getUsageTrend(periodType);
     }
 }

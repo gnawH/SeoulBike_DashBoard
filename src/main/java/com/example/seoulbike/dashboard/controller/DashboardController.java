@@ -10,10 +10,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.seoulbike.auth.model.AuthResponse;
+import com.example.seoulbike.dashboard.model.DashboardTrendPoint;
 import com.example.seoulbike.dashboard.model.DashboardWordCloudItem;
 import com.example.seoulbike.dashboard.service.DashboardWordCloudService;
+import com.example.seoulbike.service.IDashboardService;
 
 import jakarta.servlet.http.HttpSession;
+import java.util.Map;
 
 /**
  * DashboardController
@@ -28,9 +31,11 @@ public class DashboardController {
     private static final Logger log = LoggerFactory.getLogger(DashboardController.class);
 
     private final DashboardWordCloudService wordCloudService;
+    private final IDashboardService dashboardService;
 
-    public DashboardController(DashboardWordCloudService wordCloudService) {
+    public DashboardController(DashboardWordCloudService wordCloudService, IDashboardService dashboardService) {
         this.wordCloudService = wordCloudService;
+        this.dashboardService = dashboardService;
     }
 
     /**
@@ -50,11 +55,14 @@ public class DashboardController {
 
         log.info("[DASHBOARD] 데이터 생성 시작 - userId: {}, 담당구역: {}", loginUser.getUserId(), loginUser.getRegion());
 
-        // 2. 워드클라우드 데이터 생성 (Service 호출)
-        // 서비스 내부에서 단계별 로그와 시간을 측정함
+        // 2. 대시보드 메인 데이터 (KPI, 성별, 계절 등)
+        Map<String, Object> dashboardData = dashboardService.getDashboardData(loginUser.getUserId());
+        model.addAllAttributes(dashboardData);
+
+        // 3. 워드클라우드 데이터 생성 (Service 호출)
         List<DashboardWordCloudItem> wordCloudData = wordCloudService.getWordCloudData(loginUser.getRegion());
 
-        // 3. 뷰로 데이터 전달
+        // 4. 뷰로 데이터 전달
         model.addAttribute("wordCloudData", wordCloudData);
         model.addAttribute("loginUser", loginUser);
 

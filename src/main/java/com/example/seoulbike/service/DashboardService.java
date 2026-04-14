@@ -12,6 +12,7 @@ import com.example.seoulbike.dashboard.model.DashboardGenderRatio;
 import com.example.seoulbike.dashboard.model.DashboardKpi;
 import com.example.seoulbike.dashboard.model.DashboardQueryFilter;
 import com.example.seoulbike.dashboard.model.DashboardSeasonUsage;
+import com.example.seoulbike.dashboard.model.DashboardTrendPoint;
 
 @Service
 public class DashboardService implements IDashboardService {
@@ -51,6 +52,14 @@ public class DashboardService implements IDashboardService {
 		result.put("bikeStatus", "대여가능");
 		                              
 		return result;
+	}
+
+	@Override
+	public List<DashboardTrendPoint> getUsageTrend(String periodType) {
+		DashboardQueryFilter filter = new DashboardQueryFilter();
+		filter.setPeriodType(periodType);
+		filter.setYear(2025); // 기본 연환
+		return dashboardRepository.selectUsageTrend(filter);
 	}
 
 }
