@@ -126,12 +126,18 @@ public class AuthController {
     	}
     	try {
     		authService.updateUser(signupDto);
+			loginUser.setName(signupDto.getName());
+			loginUser.setEmail(signupDto.getEmail());
+			loginUser.setRegion(signupDto.getRegion());
+			session.setAttribute("loginUser", loginUser);
     		return "redirect:/";
     	}catch (RuntimeException e) {
             model.addAttribute("message", e.getMessage());
+			model.addAttribute("loginUser", loginUser);
             return "auth/updateUser";
         }catch (Exception e) {
             model.addAttribute("message", "UPDATE_FAIL");
+			model.addAttribute("loginUser", loginUser);
             return "auth/updateUser";
         }
     }
@@ -163,9 +169,11 @@ public class AuthController {
             
     	}catch (RuntimeException e) {
             model.addAttribute("message", e.getMessage());
+			model.addAttribute("loginUser", loginUser);
             return "auth/updateUser";
         } catch (Exception e) {
             model.addAttribute("message", "DELETE_FAIL");
+			model.addAttribute("loginUser", loginUser);
             return "auth/updateUser";
         }
     }
