@@ -654,29 +654,12 @@
                         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CartoDB</a>'
                     }).addTo(leafletMap);
 
-                    const response = await fetch('/api/bikes/realtime');
+                    const response = await fetch('/api/dashboard/realtime-map');
                     const data = await response.json();
 
-                    if (data.rentBikeStatus && data.rentBikeStatus.row) {
-                        const rows = data.rentBikeStatus.row;
-
-                        rows.forEach(r => {
-                            r.sharedInt = parseInt(r.shared, 10);
-                            r.rackTotCntInt = parseInt(r.rackTotCnt, 10);
-                            r.parkingBikeTotCntInt = parseInt(r.parkingBikeTotCnt, 10);
-                        });
-
-                        const sortedDesc = [...rows].sort((a, b) => {
-                            if (b.sharedInt === a.sharedInt) return b.rackTotCntInt - a.rackTotCntInt;
-                            return b.sharedInt - a.sharedInt;
-                        });
-                        const top4Excess = sortedDesc.slice(0, 4);
-
-                        const sortedAsc = [...rows].sort((a, b) => {
-                            if (a.sharedInt === b.sharedInt) return b.rackTotCntInt - a.rackTotCntInt;
-                            return a.sharedInt - b.sharedInt;
-                        });
-                        const top4Shortage = sortedAsc.slice(0, 4);
+                    if (data) {
+                        const top4Excess = data.top4Stations || [];
+                        const top4Shortage = data.bottom4Stations || [];
 
                         const excessListHtml = document.getElementById('excessList');
                         const shortageListHtml = document.getElementById('shortageList');
@@ -707,25 +690,21 @@
                                 popupAnchor: [0, -14]
                             });
 
-                            L.marker([station.stationLatitude, station.stationLongitude], { icon: customIcon })
+                            L.marker([station.latitude, station.longitude], { icon: customIcon })
                                 .addTo(leafletMap)
-                                .bindPopup(`<div style="text-align:center;"><b>${cleanName}</b><br><span style="color:${markerColor}; font-weight:bold;">${i18n.occupancy}: ${station.shared}%</span></div>`);
+                                .bindPopup(`<div style="text-align:center;"><b>${cleanName}</b><br><span style="color:${markerColor}; font-weight:bold;">${i18n.occupancy}: ${station.occupancyRate}%</span></div>`);
 
                             return `
                                 <div class="flex justify-between items-center text-sm py-0.5">
                                     <span class="text-slate-700 font-medium truncate w-[60%]" title="${cleanName}">${index + 1}. ${cleanName}</span>
                                     <div class="flex items-center gap-1.5 justify-end w-[40%]">
-                                        <span class="text-[10px] text-slate-400 font-medium whitespace-nowrap">(${station.parkingBikeTotCntInt}/${station.rackTotCntInt}대)</span>
-                                        <span class="${isExcess ? 'text-blue-600' : 'text-red-600'} font-bold whitespace-nowrap">${station.shared}%</span>
+                                        <span class="text-[10px] text-slate-400 font-medium whitespace-nowrap">(${station.parkingBikeTotCnt}/${station.rackTotCnt}대)</span>
+                                        <span class="${isExcess ? 'text-blue-600' : 'text-red-600'} font-bold whitespace-nowrap">${station.occupancyRate}%</span>
                                     </div>
                                 </div>
                             `;
                         };
 
-                        // 1. (Removed) Rendering all stations as small circles for cleaner view
-                        // Only the Top 4 stations for each category will be rendered below.
-
-                        // 2. Render Top 4 lists in Sidebar and Highlight them on Map with rich icons
                         if (excessListHtml) {
                             top4Excess.forEach((station, idx) => {
                                 excessListHtml.innerHTML += renderStation(station, 'excess', idx);
@@ -738,10 +717,15 @@
                             });
                         }
 
-                        const allTopMarkers = [...top4Excess, ...top4Shortage];
-                        if (allTopMarkers.length > 0) {
-                            const bounds = L.latLngBounds(allTopMarkers.map(s => [s.stationLatitude, s.stationLongitude]));
-                            leafletMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
+                        // 백엔드에서 준 정보 기반으로 지도 센터 이동
+                        if (data.centerLatitude && data.centerLongitude) {
+                            leafletMap.setView([data.centerLatitude, data.centerLongitude], 13);
+                        } else {
+                            const allTopMarkers = [...top4Excess, ...top4Shortage];
+                            if (allTopMarkers.length > 0) {
+                                const bounds = L.latLngBounds(allTopMarkers.map(s => [s.latitude, s.longitude]));
+                                leafletMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
+                            }
                         }
                     }
 

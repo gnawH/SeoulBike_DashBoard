@@ -347,4 +347,20 @@
         WHERE ROWNUM <![CDATA[ <= ]]> NVL(#{limit}, 4)
     </select>
 
+    <!-- 특정 지역구의 대여소 마스터 정보 조회 (API 실시간 데이터 조인용) -->
+    <select id="selectRentalOfficesByRegion"
+            parameterType="String"
+            resultMap="stationOccupancyResultMap">
+        SELECT
+            RENTAL_OFFICE_ID AS STATION_ID,
+            RENTAL_OFFICE_NAME AS STATION_NAME,
+            REGION AS REGION_NAME,
+            LATITUDE,
+            LONGITUDE,
+            0 AS OCCUPANCY_RATE,
+            'NORMAL' AS OCCUPANCY_STATUS
+        FROM RENTAL_OFFICE_INFO
+        WHERE REGION = #{region}
+    </select>
+
 </mapper>

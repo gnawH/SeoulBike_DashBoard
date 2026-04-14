@@ -71,4 +71,7 @@ public interface IDashboardRepository {
 
     /** 담당구 기준 워드클라우드 데이터 조회 */
     List<DashboardWordCloudItem> selectWordCloudByRegion(DashboardQueryFilter filter);
+
+    /** 특정 지역구의 대여소 마스터 정보 조회 (API 실시간 데이터 조인용) */
+    List<DashboardStationOccupancy> selectRentalOfficesByRegion(String region);
 }
