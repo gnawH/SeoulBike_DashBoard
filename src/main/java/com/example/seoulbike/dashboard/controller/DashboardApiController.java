@@ -17,9 +17,12 @@ import jakarta.servlet.http.HttpSession;
 public class DashboardApiController {
 
     private final DashboardWordCloudService wordCloudService;
+    private final com.example.seoulbike.dashboard.service.DashboardRealtimeMapService realtimeMapService;
 
-    public DashboardApiController(DashboardWordCloudService wordCloudService) {
+    public DashboardApiController(DashboardWordCloudService wordCloudService,
+                                  com.example.seoulbike.dashboard.service.DashboardRealtimeMapService realtimeMapService) {
         this.wordCloudService = wordCloudService;
+        this.realtimeMapService = realtimeMapService;
     }
 
     @GetMapping("/wordcloud")
@@ -27,5 +30,16 @@ public class DashboardApiController {
         AuthResponse loginUser = (AuthResponse) session.getAttribute("loginUser");
         String region = (loginUser != null) ? loginUser.getRegion() : null;
         return wordCloudService.getWordCloudData(region);
+    }
+
+    @GetMapping("/realtime-map")
+    public com.example.seoulbike.dashboard.model.DashboardRealtimeMapResponse getRealtimeMap(HttpSession session) {
+        AuthResponse loginUser = (AuthResponse) session.getAttribute("loginUser");
+        String region = (loginUser != null) ? loginUser.getRegion() : null;
+        if (region == null) {
+            // 기본값 처리 또는 에러 처리 (여기서는 빈 응답)
+            return new com.example.seoulbike.dashboard.model.DashboardRealtimeMapResponse();
+        }
+        return realtimeMapService.getRealtimeMapData(region);
     }
 }

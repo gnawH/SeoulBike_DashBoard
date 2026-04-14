@@ -37,4 +37,10 @@ public class DashboardStationOccupancy {
 
     /** 상태 코드: OVER(회수 필요), UNDER(보충 필요), NORMAL */
     private String occupancyStatus;
+
+    /** 현재 주차된 자전거 수 (API 조인용) */
+    private int parkingBikeTotCnt;
+
+    /** 전체 거치대 수 (API 조인용) */
+    private int rackTotCnt;
 }
