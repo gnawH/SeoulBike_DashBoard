@@ -109,7 +109,7 @@
 
             <!-- KPI Summary Ribbon -->
             <section id="kpi_summary_ribbon" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Card 1: 탄소 절감량 -->
+                <!-- Card 1 -->
                 <div
                     class="bg-white p-5 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden group hover:border-bike-green transition-colors cursor-default">
                     <div class="flex justify-between items-start mb-4">
@@ -119,33 +119,48 @@
                         </div>
                         <span
                             class="flex items-center text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
-                            <i class="fa-solid fa-tree mr-1"></i> <span th:text="#{kpi.carbon.badge}">약 15만 그루</span>
+                            <i class="fa-solid fa-tree mr-1"></i> <span
+                                th:text="|약 ${kpi.treeEquivalentCount}억 #{kpi.carbon.tree.unit} |">약
+                                15억 그루</span>
                         </span>
                     </div>
                     <h3 class="text-slate-500 text-sm font-medium mb-1" th:text="#{kpi.carbon.title}">2025년 총 탄소 절감량
                     </h3>
-                    <div class="text-2xl font-bold text-slate-900 group-hover:text-bike-green transition-colors">2,450.5
+                    <div class="text-2xl font-bold text-slate-900 group-hover:text-bike-green transition-colors">
+                        <span th:text="${#numbers.formatInteger(kpi.carbonReductionTon, 1, 'COMMA')}">2,451</span>
                         <span class="text-lg font-normal text-slate-500" th:text="#{kpi.carbon.unit}">ton</span>
                     </div>
                 </div>
-
-                <!-- Card 2: 주행거리 -->
+                <!-- Card 2 -->
                 <div
                     class="bg-white p-5 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden group hover:border-blue-400 transition-colors cursor-default">
                     <div class="flex justify-between items-start mb-4">
                         <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500">
                             <i class="fa-solid fa-route text-lg"></i>
                         </div>
-                        <span class="text-xs font-medium text-slate-400" th:text="#{kpi.distance.badge}">지구 둘레
-                            362바퀴</span>
+                        <span class="text-xs font-medium text-slate-400">
+                            <span th:text="#{kpi.distance.earth.ref}">지구 둘레</span>
+
+                            <th:block th:if="${kpi.earthRoundsEquivalent >= 100000000}">
+                                <span
+                                    th:text="${#numbers.formatDecimal(kpi.earthRoundsEquivalent / 100000000.0, 1, 1)} + '억'">1.5억</span>
+                            </th:block>
+
+                            <th:block th:if="${kpi.earthRoundsEquivalent < 100000000}">
+                                <span
+                                    th:text="${#numbers.formatInteger(kpi.earthRoundsEquivalent, 0, 'COMMA')}">98,000,000</span>
+                            </th:block>
+
+                            <span th:text="#{kpi.distance.earth.unit}">바퀴</span>
+                        </span>
                     </div>
                     <h3 class="text-slate-500 text-sm font-medium mb-1" th:text="#{kpi.distance.title}">총 누적 주행거리</h3>
                     <div class="text-2xl font-bold text-slate-900 group-hover:text-blue-500 transition-colors">
-                        14,500,210 <span class="text-lg font-normal text-slate-500"
-                            th:text="#{kpi.distance.unit}">km</span></div>
+                        <span th:text="${#numbers.formatInteger(kpi.totalDistanceKm, 0, 'COMMA')}">14,500,210</span>
+                        <span class="text-lg font-normal text-slate-500" th:text="#{kpi.distance.unit}">km</span>
+                    </div>
                 </div>
-
-                <!-- Card 3: 핫플레이스 -->
+                <!-- Card 3 -->
                 <div
                     class="bg-white p-5 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden group hover:border-orange-400 transition-colors cursor-default">
                     <div class="flex justify-between items-start mb-4">
@@ -154,31 +169,27 @@
                         </div>
                         <span
                             class="flex items-center text-xs font-medium text-orange-500 bg-orange-50 px-2 py-1 rounded-full">
-                            <i class="fa-solid fa-fire mr-1"></i> <span th:text="#{kpi.hotplace.badge}">1000회 대여</span>
+                            <i class="fa-solid fa-fire mr-1"></i> <span
+                                th:text="|${#numbers.formatInteger(kpi.topStationRentCount, 0, 'COMMA')}#{kpi.hotplace.count.unit}|">1000회
+                                대여</span>
                         </span>
                     </div>
                     <h3 class="text-slate-500 text-sm font-medium mb-1" th:text="#{kpi.hotplace.title}">1년 전 오늘의 최고 인기
                         대여소</h3>
                     <div class="text-2xl font-bold text-slate-900 group-hover:text-orange-500 transition-colors"
-                        th:text="#{kpi.hotplace.value}">여의나루역
-                        1번출구</div>
+                        th:text="${kpi.topStationName}">여의나루역 1번출구</div>
                 </div>
-
-                <!-- Card 4: 이용 시간 -->
+                <!-- Card 4 -->
                 <div
                     class="bg-white p-5 rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden group hover:border-purple-400 transition-colors cursor-default">
                     <div class="flex justify-between items-start mb-4">
                         <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500">
                             <i class="fa-solid fa-stopwatch text-lg"></i>
                         </div>
-                        <span
-                            class="flex items-center text-xs font-medium text-bike-green bg-bike-light px-2 py-1 rounded-full">
-                            <i class="fa-solid fa-arrow-trend-up mr-1"></i> <span th:text="#{kpi.time.badge}">전년 대비
-                                +15%</span>
-                        </span>
                     </div>
                     <h3 class="text-slate-500 text-sm font-medium mb-1" th:text="#{kpi.time.title}">2025년 누적 이용 시간</h3>
-                    <div class="text-2xl font-bold text-slate-900 group-hover:text-purple-500 transition-colors">452,000
+                    <div class="text-2xl font-bold text-slate-900 group-hover:text-purple-500 transition-colors">
+                        <span th:text="${#numbers.formatInteger(kpi.totalUsageHours, 0, 'COMMA')}">452,000</span>
                         <span class="text-lg font-normal text-slate-500" th:text="#{kpi.time.unit}">시간</span>
                     </div>
                 </div>
@@ -214,7 +225,17 @@
                                 th:text="#{chart.usage.halfyearly}">반기별</button>
                         </div>
                     </div>
-                    <div id="usageTrendsChart" class="w-full h-[320px]"></div>
+                    <div class="relative w-full h-[320px]">
+                        <!-- Loading UI Overlay -->
+                        <div id="usageTrendsSkeleton"
+                            class="absolute inset-0 z-20 bg-white flex flex-col items-center justify-center gap-3">
+                            <div
+                                class="w-12 h-12 border-4 border-slate-200 border-t-bike-green rounded-full animate-spin">
+                            </div>
+                            <p class="text-sm font-medium text-slate-500" th:text="#{map.loading}">Loading...</p>
+                        </div>
+                        <div id="usageTrendsChart" class="w-full h-full"></div>
+                    </div>
                 </div>
 
                 <!-- Top Stations by Users -->
@@ -262,21 +283,24 @@
                             <div class="flex flex-col items-center gap-3">
                                 <div class="text-4xl text-blue-500"><i class="fa-solid fa-person"></i></div>
                                 <div class="text-center">
-                                    <div class="text-2xl font-bold text-slate-900">58%</div>
+                                    <div class="text-2xl font-bold text-slate-900"
+                                        th:text="|${#numbers.formatDecimal(genderRatio['M'], 1, 1)}%|">58.0%</div>
                                     <div class="text-xs text-slate-500" th:text="#{demo.gender.male}">Male</div>
                                 </div>
                             </div>
                             <div class="flex flex-col items-center gap-3">
                                 <div class="text-4xl text-pink-500"><i class="fa-solid fa-person-dress"></i></div>
                                 <div class="text-center">
-                                    <div class="text-2xl font-bold text-slate-900">42%</div>
+                                    <div class="text-2xl font-bold text-slate-900"
+                                        th:text="|${#numbers.formatDecimal(genderRatio['F'], 1, 1)}%|">42.0%
+                                    </div>
                                     <div class="text-xs text-slate-500" th:text="#{demo.gender.female}">Female</div>
                                 </div>
                             </div>
                         </div>
                         <div class="w-full flex h-2 rounded-full overflow-hidden mt-2">
-                            <div class="bg-blue-500 w-[58%]"></div>
-                            <div class="bg-pink-500 w-[42%]"></div>
+                            <div class="bg-blue-500" th:style="|width: ${genderRatio['M']}%|"></div>
+                            <div class="bg-pink-500" th:style="|width: ${genderRatio['F']}%|"></div>
                         </div>
                     </div>
                 </div>
@@ -327,10 +351,6 @@
                             </div>
                         </div>
                     </div>
-                    <a href="/api/bikes/download/csv"
-                        class="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg text-sm transition-colors border border-slate-200">
-                        <i class="fa-solid fa-download"></i> <span th:text="#{map.download}">Download CSV</span>
-                    </a>
                 </div>
 
                 <div class="relative h-[400px]">
@@ -454,8 +474,8 @@
                 try {
                     // Usage Trends Chart
                     const usageTrace = {
-                        x: ['Oct 18', 'Oct 19', 'Oct 20', 'Oct 21', 'Oct 22', 'Oct 23', 'Oct 24'],
-                        y: [85000, 92000, 115000, 120000, 98000, 105000, 124592],
+                        x: [],
+                        y: [],
                         type: 'scatter',
                         mode: 'lines',
                         fill: 'tozeroy',
@@ -471,6 +491,20 @@
                         showlegend: false, hovermode: 'x unified'
                     };
                     Plotly.newPlot('usageTrendsChart', [usageTrace], usageLayout, { responsive: true, displayModeBar: false });
+
+                    // Usage Trend Data Fetching (Fetch daily once for client-side aggregation)
+                    fetch('/api/dashboard/trend?periodType=daily')
+                        .then(response => response.json())
+                        .then(data => {
+                            window.usageTrendDailyData = data;
+                            // Hide Skeleton UI
+                            const skeleton = document.getElementById('usageTrendsSkeleton');
+                            if (skeleton) skeleton.classList.add('hidden');
+
+                            // Initialize chart with fetched daily data
+                            updateUsageChart('daily', document.querySelector('#chartPeriodSelector button'));
+                        })
+                        .catch(err => console.error("Initial trend fetch failed:", err));
 
                     // Top Stations Chart
                     const topStationsTrace = {
@@ -488,10 +522,25 @@
                     Plotly.newPlot('topStationsChart', [topStationsTrace], topStationsLayout, { responsive: true, displayModeBar: false });
 
                     // Seasonal Distribution
+                    const rawSeasonUsage = /*[[${seasonUsage}]]*/[];
+                    const seasonMap = {};
+                    if (rawSeasonUsage) {
+                        rawSeasonUsage.forEach(item => {
+                            seasonMap[item.seasonName] = item.usagePercent;
+                        });
+                    }
+
+                    const seasonalValues = [
+                        seasonMap['봄'] || 0,
+                        seasonMap['여름'] || 0,
+                        seasonMap['가을'] || 0,
+                        seasonMap['겨울'] || 0
+                    ];
                     const seasonalTrace = {
-                        values: [40, 25, 20, 15],
+                        values: seasonalValues,
                         labels: seasonLabels,
                         type: 'pie', hole: 0.65,
+                        sort: false,
                         marker: { colors: ['#F59E0B', '#10B981', '#EF4444', '#3B82F6'] },
                         textinfo: 'percent', textposition: 'inside', insidetextfont: { color: '#fff', size: 11 }, hoverinfo: 'label+percent'
                     };
@@ -520,13 +569,6 @@
                                     const maxFont = 80;
                                     const maxCount = Math.max(...rawData.map(item => item.rentCount));
 
-                                    // 기존 방식 (선형 비율)
-                                    // const list = rawData.map(item => {
-                                    //     let weight = (item.rentCount / maxCount) * 80;
-                                    //     if (weight < 12) weight = 12;
-                                    //     return [item.stationName, weight];
-                                    // });
-
                                     if (mode === 'softmax') {
                                         const logs = rawData.map(item => Math.log1p(item.rentCount));
                                         const maxLog = Math.max(...logs);
@@ -543,12 +585,7 @@
                                     }
 
                                     if (mode === 'top-flat-tail-contrast') {
-                                        // --- gamma presets for power curve ---
-                                        // const gamma = 1.5;   // (A) 완만한 곡선: 상위권 차이 큼, 하위권도 크기 차이 적음
-                                        const gamma = 1.85;  // (B) 중간 곡선: 상위권 차이 적당, 하위권 차이 커짐
-                                        // const gamma = 2.15;    // (C) 강한 곡선: 상위권 거의 동일, 하위권 급격히 작아짐 (기본값)
-                                        // const gamma = 2.5;   // (D) 극단적 곡선: 상위권 완전 평평, 하위권만 작아짐
-                                        // 원하는 곡선으로 위 주석을 전환해서 실험 가능
+                                        const gamma = 2.15;
                                         return rawData.map(item => {
                                             const ratio = maxCount === 0 ? 0 : item.rentCount / maxCount;
                                             const curved = Math.pow(ratio, gamma);
@@ -594,63 +631,100 @@
             window.addEventListener('load', initializeCharts);
             setTimeout(initializeCharts, 1200);
 
+            // Global store for trend data
+            window.usageTrendDailyData = [];
+
             // Chart Update Logic
             function updateUsageChart(period, btnElement) {
                 // 1. Update Buttons
                 const container = document.getElementById('chartPeriodSelector');
-                const buttons = container.querySelectorAll('button');
-
-                // Reset all to unselected
-                buttons.forEach(btn => {
-                    btn.classList.remove('bg-white', 'text-slate-800', 'shadow-sm', 'border-slate-200');
-                    btn.classList.add('text-slate-500', 'border-transparent');
-                });
-
-                // Set clicked button to selected
-                btnElement.classList.remove('text-slate-500', 'border-transparent');
-                btnElement.classList.add('bg-white', 'text-slate-800', 'shadow-sm', 'border-slate-200');
-
-                // 2. Update Data
-                let nx = [], ny = [];
-                if (period === 'daily') {
-                    nx = ['10/18', '10/19', '10/20', '10/21', '10/22', '10/23', '10/24'];
-                    ny = [85000, 92000, 115000, 120000, 98000, 105000, 124592];
-                } else if (period === 'monthly') {
-                    nx = ['5월', '6월', '7월', '8월', '9월', '10월'];
-                    ny = [2100000, 2400000, 2800000, 3100000, 3500000, 3200000];
-                } else if (period === 'quarterly') {
-                    nx = ['1분기', '2분기', '3분기', '4분기(예상)'];
-                    ny = [4500000, 7200000, 9400000, 8100000];
-                } else if (period === 'half-yearly') {
-                    nx = ['23년 상반기', '23년 하반기', '24년 상반기', '24년 하반기(예상)'];
-                    ny = [12000000, 14500000, 15200000, 17500000];
+                if (container && btnElement) {
+                    const buttons = container.querySelectorAll('button');
+                    buttons.forEach(btn => {
+                        btn.classList.remove('bg-white', 'text-slate-800', 'shadow-sm', 'border-slate-200');
+                        btn.classList.add('text-slate-500', 'border-transparent');
+                    });
+                    btnElement.classList.remove('text-slate-500', 'border-transparent');
+                    btnElement.classList.add('bg-white', 'text-slate-800', 'shadow-sm', 'border-slate-200');
                 }
 
-                // Push new data to Plotly
-                Plotly.update('usageTrendsChart', {
-                    x: [nx],
-                    y: [ny]
-                });
+                if (!window.usageTrendDailyData || window.usageTrendDailyData.length === 0) return;
+
+                const rawData = window.usageTrendDailyData;
+                let nx = [], ny = [];
+
+                if (period === 'daily') {
+                    nx = rawData.map(item => {
+                        const [m, d] = item.periodLabel.split('-');
+                        return parseInt(m) + '/' + parseInt(d);
+                    });
+                    ny = rawData.map(item => item.rentCount);
+
+                    // --- Default Zoom to 2-week window ---
+                    const today = new Date();
+                    const mStr = String(today.getMonth() + 1).padStart(2, '0');
+                    const dStr = String(today.getDate()).padStart(2, '0');
+                    const todayLabel = `${mStr}-${dStr}`;
+
+                    let todayIndex = rawData.findIndex(item => item.periodLabel >= todayLabel);
+                    if (todayIndex === -1) todayIndex = rawData.length - 1;
+
+                    const zoomStart = Math.max(0, todayIndex - 7);
+                    const zoomEnd = Math.min(rawData.length - 1, todayIndex + 7);
+
+                    Plotly.relayout('usageTrendsChart', {
+                        'xaxis.range': [zoomStart - 0.5, zoomEnd + 0.5]
+                    });
+                } else if (period === 'monthly') {
+                    const monthlyMap = {};
+                    rawData.forEach(d => {
+                        const month = parseInt(d.periodLabel.substring(0, 2)) + '월';
+                        monthlyMap[month] = (monthlyMap[month] || 0) + d.rentCount;
+                    });
+                    nx = Object.keys(monthlyMap).sort((a, b) => parseInt(a) - parseInt(b));
+                    ny = nx.map(m => monthlyMap[m]);
+
+                    Plotly.relayout('usageTrendsChart', { 'xaxis.autorange': true });
+                } else if (period === 'quarterly') {
+                    const quarterlyMap = {};
+                    rawData.forEach(d => {
+                        const monthInt = parseInt(d.periodLabel.substring(0, 2));
+                        const quarter = Math.ceil(monthInt / 3) + '분기';
+                        quarterlyMap[quarter] = (quarterlyMap[quarter] || 0) + d.rentCount;
+                    });
+                    nx = ['1분기', '2분기', '3분기', '4분기'];
+                    ny = nx.map(q => quarterlyMap[q] || 0);
+
+                    Plotly.relayout('usageTrendsChart', { 'xaxis.autorange': true });
+                } else if (period === 'half-yearly') {
+                    const halfMap = {};
+                    rawData.forEach(d => {
+                        const monthInt = parseInt(d.periodLabel.substring(0, 2));
+                        const half = monthInt <= 6 ? '상반기' : '하반기';
+                        halfMap[half] = (halfMap[half] || 0) + d.rentCount;
+                    });
+                    nx = ['상반기', '하반기'];
+                    ny = nx.map(h => halfMap[h] || 0);
+
+                    Plotly.relayout('usageTrendsChart', { 'xaxis.autorange': true });
+                }
+
+                Plotly.update('usageTrendsChart', { x: [nx], y: [ny] });
             }
 
             function updateTopStationsChart(month) {
-                // Determine mock data based on month (or 'all')
                 let nx = [], ny = [];
                 if (month === 'all') {
                     nx = [2100000, 1850000, 1450000, 1200000, 950000];
                     ny = ['여의도공원    ', '뚝섬유원지    ', '홍대입구역    ', '강남역    ', '신촌역    '];
                 } else if (month === '4' || month === '5' || month === '9' || month === '10') {
-                    // Spring/Autumn hot spots
                     nx = [342000, 280000, 210000, 195000, 152000];
                     ny = ['여의나루역    ', '올림픽공원    ', '서울숲    ', '뚝섬유원지    ', '반포한강공원    '];
                 } else {
-                    // Default logic
                     const base = parseInt(month) * 15000;
                     nx = [base + 50000, base + 40000, base + 25000, base + 12000, base];
                     ny = ['여의도공원    ', '강남역    ', '잠실역    ', '고속터미널역    ', '신도림역    '];
                 }
-
-                // Push new data to Plotly
                 Plotly.update('topStationsChart', { x: [nx], y: [ny] });
             }
 

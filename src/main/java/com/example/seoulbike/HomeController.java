@@ -21,10 +21,9 @@ public class HomeController {
 	public String home(HttpSession session, Model model) {
 		AuthResponse loginUser = (AuthResponse) session.getAttribute("loginUser");
 		
-		if (loginUser != null) {
-			Map<String, Object> dashboardData = dashboardService.getDashboardData(loginUser.getUserId());
-			model.addAllAttributes(dashboardData);
-		}
+		String userId = (loginUser != null) ? loginUser.getUserId() : null;
+		Map<String, Object> dashboardData = dashboardService.getDashboardData(userId);
+		model.addAllAttributes(dashboardData);
 		
 		return "index";
 	}
