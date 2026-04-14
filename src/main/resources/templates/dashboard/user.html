@@ -288,21 +288,24 @@
                             <div class="flex flex-col items-center gap-3">
                                 <div class="text-4xl text-blue-500"><i class="fa-solid fa-person"></i></div>
                                 <div class="text-center">
-                                    <div class="text-2xl font-bold text-slate-900">58%</div>
+                                    <div class="text-2xl font-bold text-slate-900"
+                                        th:text="|${#numbers.formatDecimal(genderRatio['M'], 1, 1)}%|">58.0%</div>
                                     <div class="text-xs text-slate-500" th:text="#{demo.gender.male}">Male</div>
                                 </div>
                             </div>
                             <div class="flex flex-col items-center gap-3">
                                 <div class="text-4xl text-pink-500"><i class="fa-solid fa-person-dress"></i></div>
                                 <div class="text-center">
-                                    <div class="text-2xl font-bold text-slate-900">42%</div>
+                                    <div class="text-2xl font-bold text-slate-900"
+                                        th:text="|${#numbers.formatDecimal(genderRatio['F'], 1, 1)}%|">42.0%
+                                    </div>
                                     <div class="text-xs text-slate-500" th:text="#{demo.gender.female}">Female</div>
                                 </div>
                             </div>
                         </div>
                         <div class="w-full flex h-2 rounded-full overflow-hidden mt-2">
-                            <div class="bg-blue-500 w-[58%]"></div>
-                            <div class="bg-pink-500 w-[42%]"></div>
+                            <div class="bg-blue-500" th:style="|width: ${genderRatio['M']}%|"></div>
+                            <div class="bg-pink-500" th:style="|width: ${genderRatio['F']}%|"></div>
                         </div>
                     </div>
                 </div>

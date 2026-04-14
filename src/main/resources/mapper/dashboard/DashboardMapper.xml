@@ -35,8 +35,8 @@
     </resultMap>
 
     <resultMap id="genderRatioResultMap" type="com.example.seoulbike.dashboard.model.DashboardGenderRatio">
-        <result property="malePercent" column="MALE_PERCENT" />
-        <result property="femalePercent" column="FEMALE_PERCENT" />
+        <result property="gender" column="GENDER"/>
+    	<result property="percent" column="PERCENT"/>
     </resultMap>
 
     <resultMap id="regionUsageResultMap" type="com.example.seoulbike.dashboard.model.DashboardRegionUsage">
@@ -121,11 +121,12 @@
     <select id="selectGenderRatio"
             parameterType="com.example.seoulbike.dashboard.model.DashboardQueryFilter"
             resultMap="genderRatioResultMap">
-        SELECT
-            MALE_PERCENT,
-            FEMALE_PERCENT
-        FROM DASHBOARD_GENDER_RATIO
-        WHERE YEAR_VAL = #{year}
+        SELECT 
+		    UPPER(GENDER) AS GENDER,
+		    ROUND(COUNT(*) / (SELECT COUNT(*) FROM SEOUL_BIKE WHERE GENDER IS NOT NULL) * 100, 1) AS PERCENT
+		FROM SEOUL_BIKE
+		WHERE GENDER IS NOT NULL
+		GROUP BY UPPER(GENDER)
     </select>
 
     <!-- 지역별 이용 분포 -->

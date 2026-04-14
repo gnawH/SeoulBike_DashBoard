@@ -1,14 +1,14 @@
 package com.example.seoulbike.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.seoulbike.auth.model.User;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import com.example.seoulbike.dashboard.dao.IDashboardRepository;
+import com.example.seoulbike.dashboard.model.DashboardGenderRatio;
 import com.example.seoulbike.dashboard.model.DashboardKpi;
 import com.example.seoulbike.dashboard.model.DashboardQueryFilter;
 
@@ -33,6 +33,13 @@ public class DashboardService implements IDashboardService {
 			kpi.setTopStationName(topStation.getTopStationName());
 			kpi.setTopStationRentCount(topStation.getTopStationRentCount());
 		}
+		
+		List<DashboardGenderRatio> genderList = dashboardRepository.selectGenderRatio(filter);
+		Map<String, Double> genderMap = new HashMap<>();
+		for (DashboardGenderRatio gr : genderList) {
+			genderMap.put(gr.getGender(), gr.getPercent());
+		}
+		result.put("genderRatio", genderMap);
 		
 		result.put("kpi", kpi);
 		result.put("message", "환영합니다");

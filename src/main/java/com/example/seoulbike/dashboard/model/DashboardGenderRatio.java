@@ -17,9 +17,6 @@ import lombok.ToString;
 @Setter
 @ToString
 public class DashboardGenderRatio {
-    /** 남성 비율(%) */
-    private double malePercent;
-
-    /** 여성 비율(%) */
-    private double femalePercent;
+	private String gender;
+    private double percent;
 }
