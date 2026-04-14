@@ -678,7 +678,7 @@
                 } else if (period === 'monthly') {
                     const monthlyMap = {};
                     rawData.forEach(d => {
-                        const month = parseInt(d.periodLabel.substring(0, 2)) + '월';
+                        const month = parseInt(d.periodLabel.substring(0, 2)) + [[#{ unit.month }]];
                         monthlyMap[month] = (monthlyMap[month] || 0) + d.rentCount;
                     });
                     nx = Object.keys(monthlyMap).sort((a, b) => parseInt(a) - parseInt(b));
@@ -689,10 +689,15 @@
                     const quarterlyMap = {};
                     rawData.forEach(d => {
                         const monthInt = parseInt(d.periodLabel.substring(0, 2));
-                        const quarter = Math.ceil(monthInt / 3) + '분기';
+                        const quarter = Math.ceil(monthInt / 3) + [[#{ unit.quarter }]];
                         quarterlyMap[quarter] = (quarterlyMap[quarter] || 0) + d.rentCount;
                     });
-                    nx = ['1분기', '2분기', '3분기', '4분기'];
+                    nx = [
+                        '1' + [[#{ unit.quarter }]],
+                        '2' + [[#{ unit.quarter }]],
+                        '3' + [[#{ unit.quarter }]],
+                        '4' + [[#{ unit.quarter }]]
+                    ];
                     ny = nx.map(q => quarterlyMap[q] || 0);
 
                     Plotly.relayout('usageTrendsChart', { 'xaxis.autorange': true });
@@ -700,10 +705,10 @@
                     const halfMap = {};
                     rawData.forEach(d => {
                         const monthInt = parseInt(d.periodLabel.substring(0, 2));
-                        const half = monthInt <= 6 ? '상반기' : '하반기';
+                        const half = monthInt <= 6 ? [[#{ unit.half.first }]] : [[#{ unit.half.second }]];
                         halfMap[half] = (halfMap[half] || 0) + d.rentCount;
                     });
-                    nx = ['상반기', '하반기'];
+                    nx = [[[#{ unit.half.first }]], [[#{ unit.half.second }]]];
                     ny = nx.map(h => halfMap[h] || 0);
 
                     Plotly.relayout('usageTrendsChart', { 'xaxis.autorange': true });
