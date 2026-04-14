@@ -469,10 +469,25 @@
                     Plotly.newPlot('topStationsChart', [topStationsTrace], topStationsLayout, { responsive: true, displayModeBar: false });
 
                     // Seasonal Distribution
+                    const rawSeasonUsage = /*[[${seasonUsage}]]*/[];
+                    const seasonMap = {};
+                    if (rawSeasonUsage) {
+                        rawSeasonUsage.forEach(item => {
+                            seasonMap[item.seasonName] = item.usagePercent;
+                        });
+                    }
+
+                    const seasonalValues = [
+                        seasonMap['봄'] || 0,
+                        seasonMap['여름'] || 0,
+                        seasonMap['가을'] || 0,
+                        seasonMap['겨울'] || 0
+                    ];
                     const seasonalTrace = {
-                        values: [40, 25, 20, 15],
+                        values: seasonalValues,
                         labels: seasonLabels,
                         type: 'pie', hole: 0.65,
+                        sort: false,
                         marker: { colors: ['#F59E0B', '#10B981', '#EF4444', '#3B82F6'] },
                         textinfo: 'percent', textposition: 'inside', insidetextfont: { color: '#fff', size: 11 }, hoverinfo: 'label+percent'
                     };
