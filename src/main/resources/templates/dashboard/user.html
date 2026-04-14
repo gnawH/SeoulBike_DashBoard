@@ -7,6 +7,11 @@
     <title>SeoulBike Dashboard</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
     <script>
         tailwind.config = {
             theme: {
@@ -242,7 +247,17 @@
                                 th:text="#{chart.usage.halfyearly}">반기별</button>
                         </div>
                     </div>
-                    <div id="usageTrendsChart" class="w-full h-[320px]"></div>
+                    <div class="relative w-full h-[320px]">
+                        <!-- Loading UI Overlay -->
+                        <div id="usageTrendsSkeleton"
+                            class="absolute inset-0 z-20 bg-white flex flex-col items-center justify-center gap-3">
+                            <div
+                                class="w-12 h-12 border-4 border-slate-200 border-t-bike-green rounded-full animate-spin">
+                            </div>
+                            <p class="text-sm font-medium text-slate-500" th:text="#{map.loading}">Loading...</p>
+                        </div>
+                        <div id="usageTrendsChart" class="w-full h-full"></div>
+                    </div>
                 </div>
 
                 <!-- Top Stations by Users -->
@@ -422,8 +437,8 @@
                 try {
                     // Usage Trends Chart
                     const usageTrace = {
-                        x: ['Oct 18', 'Oct 19', 'Oct 20', 'Oct 21', 'Oct 22', 'Oct 23', 'Oct 24'],
-                        y: [85000, 92000, 115000, 120000, 98000, 105000, 124592],
+                        x: [],
+                        y: [],
                         type: 'scatter',
                         mode: 'lines',
                         fill: 'tozeroy',
@@ -439,6 +454,20 @@
                         showlegend: false, hovermode: 'x unified'
                     };
                     Plotly.newPlot('usageTrendsChart', [usageTrace], usageLayout, { responsive: true, displayModeBar: false });
+
+                    // Usage Trend Data Fetching (Fetch daily once for client-side aggregation)
+                    fetch('/api/dashboard/trend?periodType=daily')
+                        .then(response => response.json())
+                        .then(data => {
+                            window.usageTrendDailyData = data;
+                            // Hide Skeleton UI
+                            const skeleton = document.getElementById('usageTrendsSkeleton');
+                            if (skeleton) skeleton.classList.add('hidden');
+
+                            // Initialize chart with fetched daily data
+                            updateUsageChart('daily', document.querySelector('#chartPeriodSelector button'));
+                        })
+                        .catch(err => console.error("Initial trend fetch failed:", err));
 
                     // Top Stations Chart
                     const topStationsTrace = {
@@ -572,32 +601,87 @@
             window.addEventListener('load', initializeCharts);
             setTimeout(initializeCharts, 1200);
 
+            // Global store for trend data
+            window.usageTrendDailyData = [];
+
             // Chart Update Logic
             function updateUsageChart(period, btnElement) {
+                // 1. Update Buttons
                 const container = document.getElementById('chartPeriodSelector');
-                const buttons = container.querySelectorAll('button');
+                if (container && btnElement) {
+                    const buttons = container.querySelectorAll('button');
+                    buttons.forEach(btn => {
+                        btn.classList.remove('bg-white', 'text-slate-800', 'shadow-sm', 'border-slate-200');
+                        btn.classList.add('text-slate-500', 'border-transparent');
+                    });
+                    btnElement.classList.remove('text-slate-500', 'border-transparent');
+                    btnElement.classList.add('bg-white', 'text-slate-800', 'shadow-sm', 'border-slate-200');
+                }
 
-                buttons.forEach(btn => {
-                    btn.classList.remove('bg-white', 'text-slate-800', 'shadow-sm', 'border-slate-200');
-                    btn.classList.add('text-slate-500', 'border-transparent');
-                });
+                if (!window.usageTrendDailyData || window.usageTrendDailyData.length === 0) return;
 
-                btnElement.classList.remove('text-slate-500', 'border-transparent');
-                btnElement.classList.add('bg-white', 'text-slate-800', 'shadow-sm', 'border-slate-200');
-
+                const rawData = window.usageTrendDailyData;
                 let nx = [], ny = [];
+
                 if (period === 'daily') {
-                    nx = ['10/18', '10/19', '10/20', '10/21', '10/22', '10/23', '10/24'];
-                    ny = [85000, 92000, 115000, 120000, 98000, 105000, 124592];
+                    nx = rawData.map(item => {
+                        const [m, d] = item.periodLabel.split('-');
+                        return parseInt(m) + '/' + parseInt(d);
+                    });
+                    ny = rawData.map(item => item.rentCount);
+
+                    // --- Default Zoom to 2-week window around current date ---
+                    const today = new Date();
+                    const mStr = String(today.getMonth() + 1).padStart(2, '0');
+                    const dStr = String(today.getDate()).padStart(2, '0');
+                    const todayLabel = `${mStr}-${dStr}`;
+
+                    // Find closest index for today in rawData
+                    let todayIndex = rawData.findIndex(item => item.periodLabel >= todayLabel);
+                    if (todayIndex === -1) todayIndex = rawData.length - 1;
+
+                    // Set range to roughly 2 weeks (e.g., today +/- 7 days)
+                    const zoomStart = Math.max(0, todayIndex - 7);
+                    const zoomEnd = Math.min(rawData.length - 1, todayIndex + 7);
+
+                    Plotly.relayout('usageTrendsChart', {
+                        'xaxis.range': [zoomStart - 0.5, zoomEnd + 0.5]
+                    });
                 } else if (period === 'monthly') {
-                    nx = ['5월', '6월', '7월', '8월', '9월', '10월'];
-                    ny = [2100000, 2400000, 2800000, 3100000, 3500000, 3200000];
+                    const monthlyMap = {};
+                    rawData.forEach(d => {
+                        const month = parseInt(d.periodLabel.substring(0, 2)) + '월';
+                        monthlyMap[month] = (monthlyMap[month] || 0) + d.rentCount;
+                    });
+                    nx = Object.keys(monthlyMap).sort((a, b) => parseInt(a) - parseInt(b));
+                    ny = nx.map(m => monthlyMap[m]);
+
+                    // Reset zoom for monthly
+                    Plotly.relayout('usageTrendsChart', { 'xaxis.autorange': true });
                 } else if (period === 'quarterly') {
-                    nx = ['1분기', '2분기', '3분기', '4분기(예상)'];
-                    ny = [4500000, 7200000, 9400000, 8100000];
+                    const quarterlyMap = {};
+                    rawData.forEach(d => {
+                        const monthInt = parseInt(d.periodLabel.substring(0, 2));
+                        const quarter = Math.ceil(monthInt / 3) + '분기';
+                        quarterlyMap[quarter] = (quarterlyMap[quarter] || 0) + d.rentCount;
+                    });
+                    nx = ['1분기', '2분기', '3분기', '4분기'];
+                    ny = nx.map(q => quarterlyMap[q] || 0);
+
+                    // Reset zoom for quarterly
+                    Plotly.relayout('usageTrendsChart', { 'xaxis.autorange': true });
                 } else if (period === 'half-yearly') {
-                    nx = ['23년 상반기', '23년 하반기', '24년 상반기', '24년 하반기(예상)'];
-                    ny = [12000000, 14500000, 15200000, 17500000];
+                    const halfMap = {};
+                    rawData.forEach(d => {
+                        const monthInt = parseInt(d.periodLabel.substring(0, 2));
+                        const half = monthInt <= 6 ? '상반기' : '하반기';
+                        halfMap[half] = (halfMap[half] || 0) + d.rentCount;
+                    });
+                    nx = ['상반기', '하반기'];
+                    ny = nx.map(h => halfMap[h] || 0);
+
+                    // Reset zoom for half-yearly
+                    Plotly.relayout('usageTrendsChart', { 'xaxis.autorange': true });
                 }
 
                 Plotly.update('usageTrendsChart', { x: [nx], y: [ny] });
@@ -755,6 +839,7 @@
             }
 
             window.addEventListener('load', () => {
+                initializeCharts();
                 setTimeout(initLeafletMap, 500);
                 // 5분마다 실시간 데이터 자동 갱신
                 setInterval(initLeafletMap, 300000);
